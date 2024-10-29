@@ -1,0 +1,71 @@
+import DeployButton from "@/components/deploy-button";
+import { EnvVarWarning } from "@/components/env-var-warning";
+import HeaderAuth from "@/components/header-auth";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { hasEnvVars } from "@/utils/supabase/check-env-vars";
+import { GeistSans } from "geist/font/sans";
+import { ThemeProvider } from "next-themes";
+import Link from "next/link";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import { Toaster } from "@/components/ui/sonner";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
+
+export const metadata = {
+  metadataBase: new URL(defaultUrl),
+  title: "Forge of Fables",
+  description: "The best way to manage 5e combat",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={GeistSans.className} suppressHydrationWarning>
+      <body className="bg-background text-foreground">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main className="min-h-screen flex flex-col items-center">
+            <Toaster richColors />
+            <div className="flex-1 w-full flex flex-col gap-10 items-center">
+              {/* <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+                <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
+                  <div className="flex gap-5 items-center font-semibold">
+                    <Link href={"/"}>Next.js Supabase Starter</Link>
+                    <Link href="/my-encounters">My encounters</Link>
+                    <Link href="/build-encounter">New encounter</Link>
+                  </div>
+                  {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
+                </div>
+              </nav> */}
+              <Navbar />
+              <div className="flex flex-col p-5 container">
+                <NuqsAdapter>{children}</NuqsAdapter>
+              </div>
+              <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
+                <p>
+                  Powered by{" "}
+                  <a
+                    href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
+                    target="_blank"
+                    className="font-bold hover:underline"
+                    rel="noreferrer"
+                  >
+                    Supabase
+                  </a>
+                </p>
+                <ThemeSwitcher />
+              </footer>
+            </div>
+          </main>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
