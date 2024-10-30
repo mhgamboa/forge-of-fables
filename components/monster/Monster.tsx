@@ -1,5 +1,5 @@
 import React from "react";
-import { Database } from "@/types/database.types";
+import { Tables } from "@/types/database.types";
 
 import calculateModifier from "@/utils/calculateAbilityScore";
 import calculateXP from "@/utils/calculateXP";
@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Saves, Skills, Traits, Actions } from "@/types/monster";
 
 type Props = {
-  monster: Database["public"]["Tables"]["monsters"]["Row"];
+  monster: Tables<"monsters">;
   combat: boolean;
 };
 
@@ -49,64 +49,6 @@ export default function Monster({ monster, combat }: Props) {
   const typedTraits = traits as Traits;
   const typedActions = actions as Actions;
 
-  // return (
-  //   <div>
-  //     {combat === true && <h2 className="text-xl">{name}</h2>}
-  //     <h3>{type}</h3>
-  //     <Separator className="my-2" />
-  //     <div>
-  //       <span className="font-bold">AC</span> {ac_value}
-  //     </div>
-  //     <div>
-  //       <span className="font-bold">HP</span> {hp_value}
-  //     </div>
-  //     <div>
-  //       <span className="font-bold">Speed</span> {speed.join(", ")}
-  //     </div>
-  //     <div>
-  //       {" "}
-  //       <span className="font-bold">Senses</span> {senses.join(", ")}
-  //     </div>
-  //     <div>
-  //       <span className="font-bold">Languages</span> {languages.join(", ")}
-  //     </div>
-  //     {tags.length > 0 && (
-  //       <div>
-  //         <span className="font-bold">Tags</span> {tags.join(", ")}
-  //       </div>
-  //     )}
-  //     {description && (
-  //       <div>
-  //         <span className="font-bold">Description</span> {description}
-  //       </div>
-  //     )}
-  //     {saves && (
-  //       <div>
-  //         <span className="font-bold">Saves</span> {saves.join(", ")}
-  //       </div>
-  //     )}
-  //     {skills && (
-  //       <div>
-  //         <span className="font-bold">Skills</span> {skills.join(", ")}
-  //       </div>
-  //     )}
-  //     {actions && (
-  //       <div>
-  //         <span className="font-bold">Actions</span> {actions.join(", ")}
-  //       </div>
-  //     )}
-  //     {condition_immunities && (
-  //       <div>
-  //         <span className="font-bold">Condition immunities</span> {condition_immunities.join(", ")}
-  //       </div>
-  //     )}
-  //     {damage_immunities && (
-  //       <div>
-  //         <span className="font-bold">Damage immunities</span> {damage_immunities.join(", ")}
-  //       </div>
-  //     )}
-  //   </div>
-  // );
   return (
     <div className=" lg:columns-2 lg:gap-4 bg-gray-100 p-3 rounded-sm">
       {/* <div className="pb-2 text-2xl font-bold text-red-900">{name}</div> */}
