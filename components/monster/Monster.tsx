@@ -51,9 +51,8 @@ export default function Monster({ monster, combat }: Props) {
 
   return (
     <div className=" lg:columns-2 lg:gap-4 bg-gray-100 p-3 rounded-sm">
-      {/* <div className="pb-2 text-2xl font-bold text-red-900">{name}</div> */}
-      {/* <TriangleDivider /> */}
-      {/* <Separator className='my-2'/> */}
+      <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
+      <Separator className="my-2" />
       {/* ac, hp, speed */}
       <div className="py-2 text-red-900">
         <div>
@@ -66,7 +65,6 @@ export default function Monster({ monster, combat }: Props) {
           <span className="font-bold">Speed</span> {speed.join(", ")}
         </div>
       </div>
-      {/* <TriangleDivider /> */}
       <Separator className="my-2" />
 
       {/* Ability Scores */}
@@ -78,7 +76,6 @@ export default function Monster({ monster, combat }: Props) {
         <Ability name="wis" modifier={wis} combat={combat} />
         <Ability name="cha" modifier={cha} combat={combat} />
       </div>
-      {/* <TriangleDivider /> */}
       <Separator className="my-2" />
 
       {/* Vulnerabilities/Resistances/Immunities, saves, skills, senses, languages, CR */}
@@ -204,7 +201,7 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
                 return (
                   <React.Fragment key={d.name}>
                     <div>
-                      <span className="font-semibold italic">{d.name}. </span>
+                      {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                       {d.description}
                     </div>
                     <br />

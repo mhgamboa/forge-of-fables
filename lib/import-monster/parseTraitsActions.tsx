@@ -2,7 +2,8 @@ import { Json } from "@/types/database.types";
 
 export default function parseTraitActions(arr: string[]) {
   const actionIndexes = findIndexes(arr);
-  if (!actionIndexes.Actions && !actionIndexes.ACTIONS) return { traits: [], actions: [] };
+  if (!actionIndexes.Actions && !actionIndexes.ACTIONS) return { jsonTraits: [], jsonActions: [] };
+  // if (!actionIndexes.Actions && !actionIndexes.ACTIONS) return { traits: [], actions: [] };
 
   let currentTitle = "traits";
   let currentName = "";
@@ -77,6 +78,8 @@ export default function parseTraitActions(arr: string[]) {
 
   actions.at(-1)?.content.push({ name: currentName, description: currentDescription });
 
+  console.log("traits", traits);
+  console.log("actions", actions);
   // return { traits, actions };
   const jsonActions = actions as Json[];
   const jsonTraits = traits as Json[];

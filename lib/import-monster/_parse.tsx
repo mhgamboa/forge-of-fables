@@ -9,11 +9,10 @@ import parseSkills from "./parseSkills";
 import parseCommas from "./parseCommas";
 import parseChallenge from "./parseChallenge";
 import parseTraitActions from "./parseTraitsActions";
-import { Json, Tables } from "@/types/database.types";
+import { Tables } from "@/types/database.types";
 
 const parse = (input: string) => {
   const arr = input.split(/\n/gm);
-
   const ac = parseAC(input);
   const hp = parseHP(input);
   const speed = parseSpeed(input);
@@ -86,8 +85,6 @@ const parse = (input: string) => {
     traits,
     actions,
     description: "",
-    //   tags: ["angel", "beast", "Boss"],
-    //   // };
   } as Tables<"monsters">;
 };
 
