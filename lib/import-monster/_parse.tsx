@@ -85,6 +85,7 @@ const parse = (input: string) => {
     traits,
     actions,
     description: "",
+    // tags: [],
   } as Tables<"monsters">;
 };
 

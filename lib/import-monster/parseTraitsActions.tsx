@@ -78,8 +78,6 @@ export default function parseTraitActions(arr: string[]) {
 
   actions.at(-1)?.content.push({ name: currentName, description: currentDescription });
 
-  console.log("traits", traits);
-  console.log("actions", actions);
   // return { traits, actions };
   const jsonActions = actions as Json[];
   const jsonTraits = traits as Json[];
