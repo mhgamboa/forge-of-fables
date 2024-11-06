@@ -37,24 +37,18 @@ export const updateSession = async (request: NextRequest) => {
     // https://supabase.com/docs/guides/auth/server-side/nextjs
     const user = await supabase.auth.getUser();
 
-    // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
-      console.log("/proected protected route");
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
+    // Define protected routes
+    const protectedRoutes = [
+      "/protected",
+      "/build-encounter",
+      "/my-encounters",
+      "/import-monster",
+      "/my-monsters",
+    ];
 
-    if (request.nextUrl.pathname.startsWith("/build-encounter") && user.error) {
-      console.log("/build-encounter protected route");
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
-
-    if (request.nextUrl.pathname.startsWith("/my-encounters") && user.error) {
-      console.log("/my-encounters protected route");
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
-
-    if (request.nextUrl.pathname.startsWith("/import-monster") && user.error) {
-      console.log("/my-encounters protected route");
+    // Check if the request matches any protected route
+    if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route)) && user.error) {
+      console.log("Protected route accessed without authentication:", request.nextUrl.pathname);
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
