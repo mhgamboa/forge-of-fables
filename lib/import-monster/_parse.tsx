@@ -1,4 +1,3 @@
-// import { Monster } from "@/types/combat";
 import parseAC from "./parseAC";
 import parseHP from "./parseHP";
 import parseSpeed from "./parseSpeed";
@@ -85,7 +84,7 @@ const parse = (input: string) => {
     traits,
     actions,
     description: "",
-    // tags: [],
+    tags: [] as string[],
   } as Tables<"monsters">;
 };
 
