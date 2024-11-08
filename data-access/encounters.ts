@@ -1,6 +1,5 @@
 import "server-only";
 import { createClient } from "@/utils/supabase/server";
-import MyEncounters from "@/app/my-encounters/page";
 import { redirect } from "next/navigation";
 
 export const getMyEncounters = async () => {

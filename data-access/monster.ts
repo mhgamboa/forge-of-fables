@@ -34,3 +34,26 @@ export const getXMonsters = async (query: string) => {
 
   return monsters;
 };
+
+export const getMyMonsters = async () => {
+  const supabase = createClient();
+  const user = await supabase.auth.getUser();
+  if (user.error) {
+    console.error("data-access/monster.ts getMyMonsters", user.error);
+    redirect("/sign-in");
+  }
+  const userId = user.data.user.id;
+
+  const { data: monsters } = await supabase
+    .from("monsters")
+    .select()
+    .eq("is_deleted", false)
+    .eq("user_id", userId);
+  return monsters;
+};
+
+export const getMonstersById = async (monsterIds: number[]) => {
+  const supabase = createClient();
+  const { data: monsters } = await supabase.from("monsters").select().in("id", monsterIds);
+  return monsters;
+};

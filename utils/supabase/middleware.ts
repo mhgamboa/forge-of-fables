@@ -42,6 +42,7 @@ export const updateSession = async (request: NextRequest) => {
       "/protected",
       "/build-encounter",
       "/my-encounters",
+      "/run-encounter",
       "/import-monster",
       "/my-monsters",
     ];

@@ -72,9 +72,18 @@ export const getEncounterMonsters = async (encounterId: number) => {
 
 export const getEncounterJsonName = async (id: number) => {
   const supabase = createClient();
+  // Authenticate User
+  const user = await supabase.auth.getUser();
+  if (user.error) {
+    console.error("getEncounterJsonName", user.error);
+    redirect("/sign-in");
+  }
+  const userId = user.data.user.id;
+
+  // Get Encounter JSON
   const { data: encounterData, error: encounterError } = await supabase
     .from("encounter_jsons")
-    .select("name")
+    .select("name, user_id")
     .eq("id", id)
     .single();
 
@@ -83,7 +92,29 @@ export const getEncounterJsonName = async (id: number) => {
     return "";
   }
 
+  if (encounterData.user_id !== userId) redirect("/my-encounters");
+
   if (!encounterData) return "";
 
   return encounterData.name;
+};
+
+export const getSingleEncounterJson = async (id: number) => {
+  const supabase = createClient();
+  const user = await supabase.auth.getUser();
+  if (user.error) {
+    console.error("getSingleEncounter", user.error);
+    redirect("/sign-in");
+  }
+
+  const userId = user.data.user.id;
+
+  const { data: encounterJson } = await supabase
+    .from("encounter_jsons")
+    .select("name, encounter_json")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .single();
+
+  return encounterJson;
 };
