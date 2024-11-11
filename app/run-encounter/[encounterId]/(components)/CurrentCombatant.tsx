@@ -11,11 +11,17 @@ type Props = {
 export default function CurrentCombatant({ className }: Props) {
   const index = useCombatStore(state => state.index);
   const combat = useCombatStore(state => state.combat);
+  const updateCombat = useCombatStore(state => state.updateCombat);
 
   console.log(combat[index]);
   return (
     <div className={cn("border-2 border-black rounded", className)}>
-      <Monster monster={combat[index]} combat={true} />
+      <Monster
+        monster={combat[index]}
+        combat={true}
+        updateCombat={updateCombat}
+        currentCombat={combat}
+      />
     </div>
   );
 }

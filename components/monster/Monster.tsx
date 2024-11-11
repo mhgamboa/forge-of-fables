@@ -1,18 +1,23 @@
 import React from "react";
+import 
 import { Tables } from "@/types/database.types";
 
 import calculateModifier from "@/utils/calculateAbilityScore";
 import calculateXP from "@/utils/calculateXP";
 
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Saves, Skills, Traits, Actions } from "@/types/monster";
+import { CombatMonster } from "@/types/combat";
 
 type Props = {
   monster: Tables<"monsters">;
   combat: boolean;
+  updateCombat?: (combat: CombatMonster[]) => void;
+  currentCombat?: CombatMonster[];
 };
 
-export default function Monster({ monster, combat }: Props) {
+export default function Monster({ monster, combat, updateCombat, currentCombat }: Props) {
   const {
     ac_notes,
     ac_value,
@@ -49,6 +54,11 @@ export default function Monster({ monster, combat }: Props) {
   const typedTraits = traits as Traits;
   const typedActions = actions as Actions;
 
+  const handleHPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newHp = e.target.value;
+    console.log(newHp);
+  };
+
   return (
     <div className=" lg:columns-2 lg:gap-4 bg-gray-100 p-3 rounded-sm">
       <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
@@ -59,7 +69,11 @@ export default function Monster({ monster, combat }: Props) {
           <span className="font-bold">Armor Class</span> {ac_value} {ac_notes}
         </div>
         <div>
-          <span className="font-bold">Hit Points</span> {hp_value} {hp_notes}
+          <span className="font-bold">Hit Points</span>{" "}
+          {updateCombat && (
+            <Input type="number" defaultValue={hp_value} onChange={handleHPChange} />
+          )}{" "}
+          {hp_value} {hp_notes}
         </div>
         <div id="speed">
           <span className="font-bold">Speed</span> {speed.join(", ")}
@@ -103,7 +117,8 @@ export default function Monster({ monster, combat }: Props) {
         <List list={languages} title="Languages" />
         {challenge && (
           <div>
-            <span className="font-bold">Challenge</span> {challenge} ({calculateXP(challenge)} XP)
+            <span className="font-bold">Challenge</span> {challenge} ({calculateXP(challenge)}{" "}
+            XP)
           </div>
         )}
       </div>
