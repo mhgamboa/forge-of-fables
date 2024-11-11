@@ -9,6 +9,7 @@ type CombatStore = {
   index: number;
   increment: () => void;
   decrement: () => void;
+  setIndex: (index: number) => void;
 };
 
 const CombatContext = createContext<StoreApi<CombatStore> | undefined>(undefined);
@@ -27,6 +28,7 @@ export default function CombatProvider({ children, initialCombat }: CombatProvid
       index: 0,
       increment: () => set(state => ({ index: state.index + 1 })),
       decrement: () => set(state => ({ index: state.index - 1 })),
+      setIndex: (index: number) => set({ index }),
     }))
   );
   return <CombatContext.Provider value={store}>{children}</CombatContext.Provider>;

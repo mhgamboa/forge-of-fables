@@ -144,7 +144,7 @@ const Ability = ({
       <div>
         {combat ? (
           <button className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5">
-            +{abilityModifier}
+            {abilityModifier > 0 ? `+${abilityModifier}` : abilityModifier}
           </button>
         ) : (
           <p className="w-full text-center">
