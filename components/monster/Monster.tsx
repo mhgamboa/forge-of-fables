@@ -1,6 +1,7 @@
+"use client";
 import React from "react";
-import 
 import { Tables } from "@/types/database.types";
+import { create } from "mutative";
 
 import calculateModifier from "@/utils/calculateAbilityScore";
 import calculateXP from "@/utils/calculateXP";
@@ -9,15 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Saves, Skills, Traits, Actions } from "@/types/monster";
 import { CombatMonster } from "@/types/combat";
+import { toast } from "sonner";
+import { rollDice } from "@/utils/rollDice";
+import reactStringReplace from "react-string-replace";
 
 type Props = {
   monster: Tables<"monsters">;
   combat: boolean;
   updateCombat?: (combat: CombatMonster[]) => void;
   currentCombat?: CombatMonster[];
+  index?: number;
 };
 
-export default function Monster({ monster, combat, updateCombat, currentCombat }: Props) {
+export default function Monster({ monster, combat, updateCombat, currentCombat, index }: Props) {
   const {
     ac_notes,
     ac_value,
@@ -55,23 +60,36 @@ export default function Monster({ monster, combat, updateCombat, currentCombat }
   const typedActions = actions as Actions;
 
   const handleHPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newHp = e.target.value;
-    console.log(newHp);
+    if (!currentCombat) return;
+    if (!updateCombat) return;
+    if (index === undefined) return;
+    const newState = create(currentCombat, draft => {
+      draft[index].currentHp = +e.target.value;
+    });
+    updateCombat(newState);
   };
 
   return (
-    <div className=" lg:columns-2 lg:gap-4 bg-gray-100 p-3 rounded-sm">
+    <div className=" lg:columns-2 lg:gap-4 bg-gray-100 dark:bg-gray-900 p-3 rounded-sm">
       <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
       <Separator className="my-2" />
       {/* ac, hp, speed */}
       <div className="py-2 text-red-900">
         <div>
-          <span className="font-bold">Armor Class</span> {ac_value} {ac_notes}
+          {" "}
+          <span className="font-bold">Armor Class</span> {ac_value} {ac_notes}{" "}
         </div>
-        <div>
+        <div className="flex items-center space-x-1">
           <span className="font-bold">Hit Points</span>{" "}
           {updateCombat && (
-            <Input type="number" defaultValue={hp_value} onChange={handleHPChange} />
+            <>
+              <Input
+                type="number"
+                className="w-20"
+                value={currentCombat && index != null ? currentCombat[index].currentHp : ""}
+                onChange={e => handleHPChange(e)}
+              />
+            </>
           )}{" "}
           {hp_value} {hp_notes}
         </div>
@@ -117,12 +135,10 @@ export default function Monster({ monster, combat, updateCombat, currentCombat }
         <List list={languages} title="Languages" />
         {challenge && (
           <div>
-            <span className="font-bold">Challenge</span> {challenge} ({calculateXP(challenge)}{" "}
-            XP)
+            <span className="font-bold">Challenge</span> {challenge} ({calculateXP(challenge)} XP)
           </div>
         )}
       </div>
-      {/* <TriangleDivider /> */}
       <Separator className="my-2" />
 
       {/* traits */}
@@ -152,13 +168,30 @@ const Ability = ({
   combat: boolean;
 }) => {
   const abilityModifier = calculateModifier(modifier);
+  const toastDice = (input: string) => {
+    const number = parseInt(input);
+    if (isNaN(number)) return toast("Invalid number", { position: "top-center" });
+    // if (number < 1 || number > 20) return toast("Invalid number", { position: "top-center" });
+    const result = rollDice(20);
+
+    // Iff number is negative, we don't need the + symbol in the description
+    const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
+
+    toast(`You rolled a ${result + number}`, {
+      position: "top-center",
+      description,
+    });
+  };
 
   return (
     <div className="flex w-1/6 flex-col items-center">
       <div className="font-bold">{name}</div>
       <div>
         {combat ? (
-          <button className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5">
+          <button
+            className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+            onClick={() => toastDice(abilityModifier.toString())}
+          >
             {abilityModifier > 0 ? `+${abilityModifier}` : abilityModifier}
           </button>
         ) : (
@@ -202,6 +235,24 @@ const SavesComponent = ({ saves }: { saves: Saves }) => {
 };
 
 const ActionsComponent = ({ actions }: { actions: Actions }) => {
+  const toastDice = (input: string) => {
+    const numDiceMatch = input.match(/^\d+/);
+    const diceSideesMatch = input.match(/(?<=d)\d+/);
+    const modifierMatch = input.match(/(?<!d)\d+$/);
+
+    const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
+    const diceSides = diceSideesMatch ? Number(diceSideesMatch[0]) : null;
+    const modifier = modifierMatch ? Number(modifierMatch[0]) : null;
+
+    if (!diceSides) return toast("Invalid number", { position: "top-center" });
+    if (!numDice) return toast("Invalid number", { position: "top-center" });
+
+    let result: number = 0;
+    for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
+    if (modifier) result += modifier;
+
+    toast(`You rolled a ${result}`, { position: "top-center" });
+  };
   return (
     <>
       {actions.map(a => {
@@ -212,12 +263,27 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
             <div className="pt-4">
               {a.content.map(d => {
                 if (!d) return;
+                const newDescription = reactStringReplace(
+                  d.description,
+                  /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm,
+                  match => (
+                    <button
+                      className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+                      onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
+                      key={match}
+                    >
+                      {/* Delete Spaces. .slice to delete parentheses */}
+                      {match.replace(/\s/g, "").slice(1, -1)}
+                    </button>
+                  )
+                );
 
                 return (
                   <React.Fragment key={d.name}>
                     <div>
                       {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
-                      {d.description}
+                      {/* {d.description} */}
+                      {newDescription}
                     </div>
                     <br />
                   </React.Fragment>

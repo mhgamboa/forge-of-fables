@@ -13,7 +13,7 @@ type Props = {
   params: { encounterId: number };
 };
 
-export default async function Page({ params: { encounterId } }: Props) {
+export default async function RunEncounterPage({ params: { encounterId } }: Props) {
   const encounter = await getSingleEncounterJson(encounterId);
   if (!encounter) redirect("/my-encounters");
 
