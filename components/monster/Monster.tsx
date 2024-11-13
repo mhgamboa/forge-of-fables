@@ -238,7 +238,7 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
   const toastDice = (input: string) => {
     const numDiceMatch = input.match(/^\d+/);
     const diceSideesMatch = input.match(/(?<=d)\d+/);
-    const modifierMatch = input.match(/(?<!d)\d+$/);
+    const modifierMatch = input.match(/(?<!d|\d)\d+$/);
 
     const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
     const diceSides = diceSideesMatch ? Number(diceSideesMatch[0]) : null;
@@ -253,6 +253,21 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
 
     toast(`You rolled a ${result}`, { position: "top-center" });
   };
+  const toastHit = (input: string) => {
+    const number = parseInt(input);
+    if (isNaN(number)) return toast("Invalid number", { position: "top-center" });
+    // if (number < 1 || number > 20) return toast("Invalid number", { position: "top-center" });
+    const result = rollDice(20);
+
+    // Iff number is negative, we don't need the + symbol in the description
+    const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
+
+    toast(`You rolled a ${result + number}`, {
+      position: "top-center",
+      description,
+    });
+  };
+
   return (
     <>
       {actions.map(a => {
@@ -265,7 +280,7 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
                 if (!d) return;
                 const newDescription = reactStringReplace(
                   d.description,
-                  /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm,
+                  /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
                   match => (
                     <button
                       className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
@@ -278,12 +293,28 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
                   )
                 );
 
+                const parseHits = reactStringReplace(
+                  newDescription,
+                  /((?<=\s|\.)\+\d+(?=\s|\.))/gm,
+                  (match, index) => (
+                    <button
+                      className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+                      key={match}
+                      onClick={() => toastHit(match)}
+                    >
+                      {match}
+                    </button>
+                  )
+                );
+                console.log(parseHits);
+
                 return (
                   <React.Fragment key={d.name}>
                     <div>
                       {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                       {/* {d.description} */}
-                      {newDescription}
+                      {/* {newDescription} */}
+                      {parseHits}
                     </div>
                     <br />
                   </React.Fragment>
