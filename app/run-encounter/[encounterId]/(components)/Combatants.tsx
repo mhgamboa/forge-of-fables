@@ -45,7 +45,7 @@ export default function Combatants({ className }: Props) {
               onClick={e => e.stopPropagation()}
               className="w-20"
             />
-            /{monster.currentHp}
+            /{monster.hp_value}
           </div>
         </div>
       ))}
