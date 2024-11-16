@@ -8,6 +8,7 @@ import InitializeZustand from "./(components)/InitializeZustand";
 import { formatEncounter } from "@/utils/formatEncounter";
 import Combatants from "./(components)/Combatants";
 import CurrentCombatant from "./(components)/CurrentCombatant";
+import { EncounterJson } from "@/types/encounterJsonTypes";
 
 type Props = {
   params: { encounterId: number };
@@ -16,11 +17,12 @@ type Props = {
 export default async function RunEncounterPage({ params: { encounterId } }: Props) {
   const encounter = await getSingleEncounterJson(encounterId);
   if (!encounter) redirect("/my-encounters");
+  const json = encounter.encounter_json as EncounterJson;
 
   const monsterIds = Object.keys(encounter.encounter_json!).map(Number);
   const monsters = (await getMonstersById(monsterIds)) || [];
 
-  const formattedEncounter = monsters && formatEncounter(monsters);
+  const formattedEncounter = monsters && formatEncounter(monsters, json);
 
   return (
     <InitializeZustand combat={formattedEncounter}>

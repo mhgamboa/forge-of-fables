@@ -306,7 +306,6 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
                     </button>
                   )
                 );
-                console.log(parseHits);
 
                 return (
                   <React.Fragment key={d.name}>

@@ -22,6 +22,7 @@ export default function Combatants({ className }: Props) {
     });
     updateCombat(newState);
   };
+
   return (
     <div
       className={cn(
@@ -31,12 +32,12 @@ export default function Combatants({ className }: Props) {
     >
       {combat.map((monster, i) => (
         <div
-          key={monster.id}
+          key={`${monster.id}-${i}`}
           className="flex justify-between p-4 border-b last:border-b-0 cursor-pointer items-center"
           onClick={() => setIndex(i)}
         >
           <div>{monster.name}</div>
-          <div className="flex items-center space-x-4 w-32">
+          <div className="flex items-center justify-end space-x-4 w-32">
             <Input
               type="number"
               value={monster.currentHp}
