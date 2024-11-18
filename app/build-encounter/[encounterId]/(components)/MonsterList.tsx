@@ -1,4 +1,6 @@
-import React from "react";
+//
+"use client";
+import React, { useEffect, useState } from "react";
 
 import {
   Accordion,
@@ -9,14 +11,36 @@ import {
 
 import Monster from "@/components/monster/Monster";
 import { getXMonsters } from "@/data-access/monster";
+import { Tables } from "@/types/database.types";
+import { useQueryContext } from "./QueryContext";
+import { set } from "date-fns";
 
-export default async function MonsterList({ query }: { query: string }) {
-  const monsters = await getXMonsters(query);
+export default function MonsterList({ monsters }: { monsters: Tables<"monsters">[] | null }) {
+  const { query } = useQueryContext();
+  const [filteredMonsters, setFilteredMonsters] = useState<Tables<"monsters">[]>(monsters!);
+
   if (!monsters) return <div>There are no monsters :(</div>;
+
+  useEffect(() => {
+    setFilteredMonsters(monsters);
+  }, []);
+
+  useEffect(() => {
+    if (query) {
+      setFilteredMonsters(
+        monsters.filter(monster => monster.name.toLowerCase().includes(query.toLowerCase()))
+      );
+    } else {
+      setFilteredMonsters(monsters); // Reset to full list if no query
+    }
+  }, [query, monsters]);
+
+  if (!filteredMonsters || !filteredMonsters.length)
+    return <div className="w-full md:col-span-2">There are no monsters 😞</div>;
 
   return (
     <Accordion type="multiple" className="w-full md:col-span-2">
-      {monsters.map(monster => (
+      {filteredMonsters.map(monster => (
         <AccordionItem key={monster.id} value={`${monster.id}`}>
           <AccordionTrigger monster={monster}>{monster.name}</AccordionTrigger>
           <AccordionContent>

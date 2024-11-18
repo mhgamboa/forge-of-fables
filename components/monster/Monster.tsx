@@ -177,7 +177,7 @@ const Ability = ({
     // Iff number is negative, we don't need the + symbol in the description
     const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
 
-    toast(`You rolled a ${result + number}`, {
+    toast(`You rolled ${result + number}`, {
       position: "top-center",
       description,
     });
@@ -251,7 +251,7 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
     for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
     if (modifier) result += modifier;
 
-    toast(`You rolled a ${result}`, { position: "top-center" });
+    toast(`You rolled ${result}`, { position: "top-center" });
   };
   const toastHit = (input: string) => {
     const number = parseInt(input);
@@ -262,7 +262,7 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
     // Iff number is negative, we don't need the + symbol in the description
     const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
 
-    toast(`You rolled a ${result + number}`, {
+    toast(`You rolled ${result + number}`, {
       position: "top-center",
       description,
     });

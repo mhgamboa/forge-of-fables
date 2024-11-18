@@ -3,7 +3,7 @@ import "server-only";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
-export const getXMonsters = async (query: string) => {
+export const getXMonsters = async (query?: string) => {
   // const quantity = x ?? 10;
   const supabase = createClient();
   const user = await supabase.auth.getUser();

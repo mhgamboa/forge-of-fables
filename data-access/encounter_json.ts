@@ -106,7 +106,6 @@ export const getSingleEncounterJson = async (id: number) => {
     console.error("getSingleEncounter", user.error);
     redirect("/sign-in");
   }
-
   const userId = user.data.user.id;
 
   const { data: encounterJson } = await supabase
