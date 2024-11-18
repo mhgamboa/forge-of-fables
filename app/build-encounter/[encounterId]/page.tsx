@@ -11,7 +11,7 @@ import CurrentEncounter from "./(components)/CurrentEncounter";
 import SearchBar from "./(components)/SearchBar";
 
 type Props = {
-  params: { encounterId: string };
+  params: { encounterId: string }; // TODO: change to number
   searchParams?: { query?: string };
 };
 

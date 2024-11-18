@@ -13,24 +13,15 @@ export const getXMonsters = async (query: string) => {
   }
   const userId = user.data.user.id;
 
-  const { data: monsters } = query
-    ? await supabase
-        .from("monsters")
-        .select()
-        // .limit(quantity)
-        .order("name", { ascending: true })
-        .eq("is_deleted", false)
-        .or(`user_id.is.null` + `,user_id.eq.${userId}`)
-        .textSearch("name", query, {
-          type: "plain",
-        })
-    : await supabase
-        .from("monsters")
-        .select()
-        // .limit(quantity)
-        .order("name", { ascending: true })
-        .eq("is_deleted", false)
-        .or(`user_id.is.null` + `,user_id.eq.${userId}`);
+  let q = supabase
+    .from("monsters")
+    .select()
+    .order("name", { ascending: true })
+    .eq("is_deleted", false)
+    .or(`user_id.is.null` + `,user_id.eq.${userId}`);
+  if (query) q = q.ilike("name", `%${query}%`);
+
+  const { data: monsters, error } = await q;
 
   return monsters;
 };
