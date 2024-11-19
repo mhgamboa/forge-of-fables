@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { FormattedEncounterJson, type EncounterJson } from "@/types/encounterJsonTypes";
 
 export const getMyEncounterJsons = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error, data } = await supabase.auth.getUser();
   if (error) {
     console.error("getMyEncounters", error);
@@ -21,7 +21,7 @@ export const getMyEncounterJsons = async () => {
 };
 
 export const getEncounterMonsters = async (encounterId: number) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Authenticate User
   const user = await supabase.auth.getUser();
@@ -71,7 +71,7 @@ export const getEncounterMonsters = async (encounterId: number) => {
 };
 
 export const getEncounterJsonName = async (id: number) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   // Authenticate User
   const user = await supabase.auth.getUser();
   if (user.error) {
@@ -100,7 +100,7 @@ export const getEncounterJsonName = async (id: number) => {
 };
 
 export const getSingleEncounterJson = async (id: number) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await supabase.auth.getUser();
   if (user.error) {
     console.error("getSingleEncounter", user.error);

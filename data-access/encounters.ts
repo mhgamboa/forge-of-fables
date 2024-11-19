@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
 export const getMyEncounters = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await supabase.auth.getUser();
   if (user.error) {
     console.error("getMyEncounters", user.error);
@@ -14,7 +14,7 @@ export const getMyEncounters = async () => {
 };
 
 export const getEncounterMonsters = async (encounterId: number) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await supabase.auth.getUser();
   if (user.error) {
     console.error("getEncounterMonsters", user.error);

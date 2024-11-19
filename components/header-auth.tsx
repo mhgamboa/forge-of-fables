@@ -6,19 +6,18 @@ import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function AuthButton() {
-  const {
-    data: { user },
-  } = await createClient().auth.getUser();
+  // const {
+  //   data: { user },
+  // } = await createClient().auth.getUser();
+  const client = await createClient();
+  const { data: user } = await client.auth.getUser();
 
   if (!hasEnvVars) {
     return (
       <>
         <div className="flex gap-4 items-center">
           <div>
-            <Badge
-              variant={"default"}
-              className="font-normal pointer-events-none"
-            >
+            <Badge variant={"default"} className="font-normal pointer-events-none">
               Please update .env.local file with anon key and url
             </Badge>
           </div>
@@ -48,7 +47,7 @@ export default async function AuthButton() {
   }
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!
+      Hey, {user.user!.email}!
       <form action={signOutAction}>
         <Button type="submit" variant={"outline"}>
           Sign out

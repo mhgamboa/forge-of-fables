@@ -6,8 +6,12 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
-export default function Signup({ searchParams }: { searchParams: Message }) {
-  if ("message" in searchParams) {
+type Params = Promise<{ searchParams?: Message }>;
+
+export default async function Signup({ params }: { params: Params }) {
+  const { searchParams } = await params;
+  // if ("message" in searchParams) {
+  if (searchParams && "message" in searchParams) {
     return (
       <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
         <FormMessage message={searchParams} />

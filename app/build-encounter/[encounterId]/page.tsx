@@ -13,12 +13,19 @@ import SearchBar from "./(components)/SearchBar";
 import { QueryContextProvider } from "./(components)/QueryContext";
 import { getXMonsters } from "@/data-access/monster";
 
+type Params = Promise<{ encounterId: string }>;
+type SearchParams = Promise<{ query: string }>;
+
 type Props = {
-  params: { encounterId: string }; // TODO: change to number
-  searchParams?: { query?: string };
+  params: Params;
+  searchParams: SearchParams;
 };
 
-export default async function BuildEncounters({ params: { encounterId }, searchParams }: Props) {
+export default async function BuildEncounters(props: Props) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const { encounterId } = params;
+
   if (encounterId !== "new" && typeof parseInt(encounterId) !== "number")
     redirect("/build-encounter/new");
 

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export const getXMonsters = async (query?: string) => {
   // const quantity = x ?? 10;
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await supabase.auth.getUser();
   if (user.error) {
     console.error("getXMonsters", user.error);
@@ -27,7 +27,7 @@ export const getXMonsters = async (query?: string) => {
 };
 
 export const getMyMonsters = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await supabase.auth.getUser();
   if (user.error) {
     console.error("data-access/monster.ts getMyMonsters", user.error);
@@ -44,7 +44,7 @@ export const getMyMonsters = async () => {
 };
 
 export const getMonstersById = async (monsterIds: number[]) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: monsters } = await supabase.from("monsters").select().in("id", monsterIds);
   return monsters;
 };

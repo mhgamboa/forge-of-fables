@@ -11,10 +11,11 @@ import CurrentCombatant from "./(components)/CurrentCombatant";
 import { EncounterJson } from "@/types/encounterJsonTypes";
 
 type Props = {
-  params: { encounterId: number };
+  params: Promise<{ encounterId: number }>;
 };
 
-export default async function RunEncounterPage({ params: { encounterId } }: Props) {
+export default async function RunEncounterPage(props: Props) {
+  const { encounterId } = await props.params;
   const encounter = await getSingleEncounterJson(encounterId);
   if (!encounter) redirect("/my-encounters");
   const json = encounter.encounter_json as EncounterJson;

@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
 export const insertMonster = async (monster: Tables<"monsters">) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Authenticate User
   const user = await supabase.auth.getUser();

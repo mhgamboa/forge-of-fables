@@ -9,7 +9,7 @@ export const setEncounterJsonDB = async (
   encounterJson: EncounterJson,
   name: string
 ) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   // Authenticate User
   const user = await supabase.auth.getUser();
   if (user.error) {
@@ -34,7 +34,7 @@ export const setEncounterJsonDB = async (
 };
 
 export const createEncounterJsonDB = async (encounterJson: EncounterJson, name: string) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Authenticate User
   const user = await supabase.auth.getUser();
