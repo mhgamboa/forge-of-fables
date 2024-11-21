@@ -16,7 +16,6 @@ import { insertMonster } from "./actions";
 export default function ImportMonster() {
   const supabase = createClient();
 
-  // const [monster, setMonster] = useState<Tables<"monsters"> | null>(parse(text));
   const [monster, setMonster] = useState<Tables<"monsters"> | null>(null);
 
   const handleChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) =>
