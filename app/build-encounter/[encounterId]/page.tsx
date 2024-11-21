@@ -35,7 +35,6 @@ export default async function BuildEncounters(props: Props) {
   const encounterName = id ? await getEncounterJsonName(id) : "";
   const encounterJson = id ? await getEncounterMonsters(id) : [];
   const monsters = await getXMonsters();
-  console.log(monsters);
 
   return (
     <EncounterSavedContextProvider>

@@ -1,18 +1,23 @@
 "use client";
 import React from "react";
-import { Tables } from "@/types/database.types";
+import reactStringReplace from "react-string-replace";
+import { toast } from "sonner";
 import { create } from "mutative";
 
 import calculateModifier from "@/utils/calculateAbilityScore";
 import calculateXP from "@/utils/calculateXP";
 
 import { Input } from "@/components/ui/input";
+import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
+
+import { Check } from "lucide-react";
+
+import { Tables } from "@/types/database.types";
 import { Saves, Skills, Traits, Actions } from "@/types/monster";
 import { CombatMonster } from "@/types/combat";
-import { toast } from "sonner";
+
 import { rollDice } from "@/utils/rollDice";
-import reactStringReplace from "react-string-replace";
 
 type Props = {
   monster: Tables<"monsters">;
@@ -153,7 +158,7 @@ export default function Monster({ monster, combat, updateCombat, currentCombat, 
           })}
       </div>
       {/* actions */}
-      <ActionsComponent actions={typedActions} />
+      <ActionsComponent actions={typedActions} combat={combat} />
     </div>
   );
 }
@@ -234,7 +239,7 @@ const SavesComponent = ({ saves }: { saves: Saves }) => {
   );
 };
 
-const ActionsComponent = ({ actions }: { actions: Actions }) => {
+const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boolean }) => {
   const toastDice = (input: string) => {
     const numDiceMatch = input.match(/^\d+/);
     const diceSideesMatch = input.match(/(?<=d)\d+/);
@@ -292,7 +297,6 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
                     </button>
                   )
                 );
-
                 const parseHits = reactStringReplace(
                   newDescription,
                   /((?<=\s|\.)\+\d+(?=\s|\.))/gm,
@@ -314,6 +318,26 @@ const ActionsComponent = ({ actions }: { actions: Actions }) => {
                       {/* {d.description} */}
                       {/* {newDescription} */}
                       {parseHits}
+                      {combat &&
+                        (() => {
+                          const match = d.name.match(/(\d)\/day/i); // Match the number before "/day"
+                          if (match) {
+                            const count = parseInt(match[1], 10); // Extract and parse the number
+                            return Array.from({ length: count }, (_, index) => (
+                              <Toggle
+                                aria-label="Toggle bold"
+                                key={index} // Order is not changed 😶
+                                variant="outline"
+                                size="xs"
+                                className="rounded-full justify-center h-full bg-gray-500"
+                                defaultPressed
+                              >
+                                <Check className="h-2 w-2" />
+                              </Toggle>
+                            ));
+                          }
+                          return null; // Return nothing if no match
+                        })()}
                     </div>
                     <br />
                   </React.Fragment>
