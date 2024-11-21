@@ -150,9 +150,49 @@ export default function Monster({ monster, combat, updateCombat, currentCombat, 
       <div className="space-y-1 whitespace-pre-wrap py-2">
         {typedTraits &&
           typedTraits.map(t => {
+            const toastDice = (input: string) => {
+              const numDiceMatch = input.match(/^\d+/);
+              const diceSideesMatch = input.match(/(?<=d)\d+/);
+              const modifierMatch = input.match(/(?<!d|\d)\d+$/);
+
+              const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
+              const diceSides = diceSideesMatch ? Number(diceSideesMatch[0]) : null;
+              const modifier = modifierMatch ? Number(modifierMatch[0]) : null;
+
+              if (!diceSides) return toast("Invalid number", { position: "top-center" });
+              if (!numDice) return toast("Invalid number", { position: "top-center" });
+
+              let result: number = 0;
+              for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
+              if (modifier) result += modifier;
+
+              toast(`You rolled ${result}`, { position: "top-center" });
+            };
+            const newDescription = reactStringReplace(
+              t.description,
+              /((?<=\s|\.)\+\d+(?=\s|\.))/gm, //+/- 4
+              match => <RollModifier key={match} modifier={parseInt(match.replace(/\s/g, ""))} />
+            );
+            const parseDamage = reactStringReplace(
+              newDescription,
+              /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
+              match => (
+                <button
+                  className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+                  onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
+                  key={match}
+                >
+                  {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
+                  {match.replace(/\s/g, "").slice(1, -1)}
+                </button>
+              )
+            );
             return (
               <div key={t.name}>
-                <span className="font-semibold italic">{t.name}.</span> {t.description}
+                <span className="font-semibold italic">{t.name}. </span>
+                {/* {t.description} */}
+                {/* {newDescription} */}
+                {parseDamage}
               </div>
             );
           })}
@@ -258,20 +298,6 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
 
     toast(`You rolled ${result}`, { position: "top-center" });
   };
-  const toastHit = (input: string) => {
-    const number = parseInt(input);
-    if (isNaN(number)) return toast("Invalid number", { position: "top-center" });
-    // if (number < 1 || number > 20) return toast("Invalid number", { position: "top-center" });
-    const result = rollDice(20);
-
-    // Iff number is negative, we don't need the + symbol in the description
-    const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
-
-    toast(`You rolled ${result + number}`, {
-      position: "top-center",
-      description,
-    });
-  };
 
   return (
     <>
@@ -281,7 +307,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
             <h3 className="text-2xl font-light text-red-900">{a.title}</h3>
             <hr className="border-black" />
             <div className="pt-4">
-              {a.content.map(d => {
+              {a.content.map((d, i) => {
                 if (!d) return;
                 const newDescription = reactStringReplace(
                   d.description,
@@ -292,7 +318,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                       onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
                       key={match}
                     >
-                      {/* Delete Spaces. .slice to delete parentheses */}
+                      {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
                       {match.replace(/\s/g, "").slice(1, -1)}
                     </button>
                   )
@@ -301,24 +327,25 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                   newDescription,
                   /((?<=\s|\.)\+\d+(?=\s|\.))/gm,
                   (match, index) => (
-                    <button
-                      className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-                      key={match}
-                      onClick={() => toastHit(match)}
-                    >
-                      {match}
-                    </button>
+                    <RollModifier modifier={parseInt(match)} />
+                    // <button
+                    //   className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+                    //   key={match}
+                    //   onClick={() => toastHit(match)}
+                    // >
+                    //   {match}
+                    // </button>
                   )
                 );
 
                 return (
-                  <React.Fragment key={d.name}>
+                  <React.Fragment key={`${d.name}-${i}`}>
                     <div>
                       {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                       {/* {d.description} */}
                       {/* {newDescription} */}
                       {parseHits}
-                      {combat &&
+                      {/* {combat &&
                         (() => {
                           const match = d.name.match(/(\d)\/day/i); // Match the number before "/day"
                           if (match) {
@@ -337,7 +364,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                             ));
                           }
                           return null; // Return nothing if no match
-                        })()}
+                        })()} */}
                     </div>
                     <br />
                   </React.Fragment>
@@ -350,3 +377,59 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
     </>
   );
 };
+
+const RollModifier = ({ modifier }: { modifier: number }) => {
+  const toastDice = (input: string) => {
+    const number = parseInt(input);
+    if (isNaN(number)) return toast("Invalid number", { position: "top-center" });
+    // if (number < 1 || number > 20) return toast("Invalid number", { position: "top-center" });
+    const result = rollDice(20);
+
+    // Iff number is negative, we don't need the + symbol in the description
+    const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
+
+    toast(`You rolled ${result + number}`, {
+      position: "top-center",
+      description,
+    });
+  };
+
+  return (
+    <button
+      className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+      onClick={() => toastDice(modifier.toString())}
+    >
+      {modifier > 0 ? `+${modifier}` : modifier}
+    </button>
+  );
+};
+
+// const rollDamage = ({ input }: { input: string }) => {
+//   const toastDice = (input: string) => {
+//     const numDiceMatch = input.match(/^\d+/);
+//     const diceSideesMatch = input.match(/(?<=d)\d+/);
+//     const modifierMatch = input.match(/(?<!d|\d)\d+$/);
+
+//     const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
+//     const diceSides = diceSideesMatch ? Number(diceSideesMatch[0]) : null;
+//     const modifier = modifierMatch ? Number(modifierMatch[0]) : null;
+
+//     if (!diceSides) return toast("Invalid number", { position: "top-center" });
+//     if (!numDice) return toast("Invalid number", { position: "top-center" });
+
+//     let result: number = 0;
+//     for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
+//     if (modifier) result += modifier;
+
+//     toast(`You rolled ${result}`, { position: "top-center" });
+//   };
+//   return (
+//     <button
+//       className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+//       onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
+//     >
+//       {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
+//       {match.replace(/\s/g, "").slice(1, -1)}
+//     </button>
+//   );
+// };
