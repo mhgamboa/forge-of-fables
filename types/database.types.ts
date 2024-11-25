@@ -36,60 +36,73 @@ export type Database = {
         }
         Relationships: []
       }
-      encounter_stats: {
+      encounter_monsters: {
         Row: {
-          conditions: string[]
-          current_hp: number
+          created_at: string
           encounter_id: number
           id: number
-          monster_id: number | null
-          player_id: number | null
-          rolled_initiative: number
-          user_id: string
-          wave: number | null
+          monster_id: number
+          notes: string | null
         }
         Insert: {
-          conditions: string[]
-          current_hp: number
+          created_at?: string
           encounter_id: number
           id?: number
-          monster_id?: number | null
-          player_id?: number | null
-          rolled_initiative?: number
-          user_id: string
-          wave?: number | null
+          monster_id: number
+          notes?: string | null
         }
         Update: {
-          conditions?: string[]
-          current_hp?: number
+          created_at?: string
           encounter_id?: number
           id?: number
-          monster_id?: number | null
-          player_id?: number | null
-          rolled_initiative?: number
-          user_id?: string
-          wave?: number | null
+          monster_id?: number
+          notes?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "encounter_stats_encounter_id_fkey"
+            foreignKeyName: "encounter_monsters_encounter_id_fkey"
             columns: ["encounter_id"]
             isOneToOne: false
             referencedRelation: "encounters"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "encounter_stats_monster_id_fkey"
+            foreignKeyName: "encounter_monsters_monster_id_fkey"
             columns: ["monster_id"]
             isOneToOne: false
             referencedRelation: "monsters"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      encounter_players: {
+        Row: {
+          created_at: string
+          encounter_id: number | null
+          id: number
+          name: string | null
+          notes: string | null
+        }
+        Insert: {
+          created_at?: string
+          encounter_id?: number | null
+          id?: number
+          name?: string | null
+          notes?: string | null
+        }
+        Update: {
+          created_at?: string
+          encounter_id?: number | null
+          id?: number
+          name?: string | null
+          notes?: string | null
+        }
+        Relationships: [
           {
-            foreignKeyName: "encounter_stats_player_id_fkey"
-            columns: ["player_id"]
+            foreignKeyName: "encounter_players_encounter_id_fkey"
+            columns: ["encounter_id"]
             isOneToOne: false
-            referencedRelation: "players"
+            referencedRelation: "encounters"
             referencedColumns: ["id"]
           },
         ]
@@ -97,20 +110,26 @@ export type Database = {
       encounters: {
         Row: {
           created_at: string
+          description: string | null
           id: number
           name: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: number
           name: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: number
           name?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -211,45 +230,6 @@ export type Database = {
           type?: string
           user_id?: string | null
           wis?: number
-        }
-        Relationships: []
-      }
-      players: {
-        Row: {
-          ac: number | null
-          character_name: string | null
-          class: string | null
-          id: number
-          level: number | null
-          passive_perception: number | null
-          player_id: string | null
-          player_name: string | null
-          total_hp: number | null
-          user_id: string
-        }
-        Insert: {
-          ac?: number | null
-          character_name?: string | null
-          class?: string | null
-          id?: number
-          level?: number | null
-          passive_perception?: number | null
-          player_id?: string | null
-          player_name?: string | null
-          total_hp?: number | null
-          user_id: string
-        }
-        Update: {
-          ac?: number | null
-          character_name?: string | null
-          class?: string | null
-          id?: number
-          level?: number | null
-          passive_perception?: number | null
-          player_id?: string | null
-          player_name?: string | null
-          total_hp?: number | null
-          user_id?: string
         }
         Relationships: []
       }
