@@ -18,6 +18,7 @@ import { Saves, Skills, Traits, Actions } from "@/types/monster";
 import { CombatMonster } from "@/types/combat";
 
 import { rollDice } from "@/utils/rollDice";
+import { cn } from "@/lib/utils";
 
 type Props = {
   monster: Tables<"monsters">;
@@ -25,9 +26,17 @@ type Props = {
   updateCombat?: (combat: CombatMonster[]) => void;
   currentCombat?: CombatMonster[];
   index?: number;
+  className?: string;
 };
 
-export default function Monster({ monster, combat, updateCombat, currentCombat, index }: Props) {
+export default function Monster({
+  monster,
+  combat,
+  updateCombat,
+  currentCombat,
+  index,
+  className,
+}: Props) {
   const {
     ac_notes,
     ac_value,
@@ -75,7 +84,9 @@ export default function Monster({ monster, combat, updateCombat, currentCombat, 
   };
 
   return (
-    <div className=" lg:columns-2 lg:gap-4 bg-gray-100 dark:bg-gray-900 p-3 rounded-sm">
+    <div
+      className={cn("lg:columns-2 lg:gap-4 bg-gray-100 dark:bg-gray-900 p-3 rounded-sm", className)}
+    >
       <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
       <Separator className="my-2" />
       {/* ac, hp, speed */}
@@ -340,12 +351,11 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
 
                 return (
                   <React.Fragment key={`${d.name}-${i}`}>
-                    <div>
-                      {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
-                      {/* {d.description} */}
-                      {/* {newDescription} */}
-                      {parseHits}
-                      {/* {combat &&
+                    {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
+                    {/* {d.description} */}
+                    {/* {newDescription} */}
+                    {parseHits}
+                    {/* {combat &&
                         (() => {
                           const match = d.name.match(/(\d)\/day/i); // Match the number before "/day"
                           if (match) {
@@ -365,7 +375,6 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                           }
                           return null; // Return nothing if no match
                         })()} */}
-                    </div>
                     <br />
                   </React.Fragment>
                 );

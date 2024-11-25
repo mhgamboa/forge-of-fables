@@ -23,6 +23,7 @@ export default function CurrentCombatant({ className }: Props) {
         combat={true}
         updateCombat={updateCombat}
         currentCombat={combat}
+        className="h-full"
       />
     </div>
   );
