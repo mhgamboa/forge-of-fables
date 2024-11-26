@@ -350,6 +350,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                 );
 
                 return (
+                  // comment
                   <Fragment key={`${d.name}-${index}-${i}`}>
                     {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                     {/* {d.description} */}
