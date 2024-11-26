@@ -338,7 +338,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                   newDescription,
                   /((?<=\s|\.)\+\d+(?=\s|\.))/gm,
                   (match, index) => (
-                    <RollModifier modifier={parseInt(match)} />
+                    <RollModifier modifier={parseInt(match)} key={match} />
                     // <button
                     //   className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
                     //   key={match}
@@ -350,7 +350,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                 );
 
                 return (
-                  <Fragment key={`${d.name}-${index}-${i}`}>
+                  <React.Fragment key={`${d.name}-${index}-${i}`}>
                     {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                     {/* {d.description} */}
                     {/* {newDescription} */}
@@ -376,7 +376,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                           return null; // Return nothing if no match
                         })()} */}
                     <br />
-                  </Fragment>
+                  </React.Fragment>
                 );
               })}
             </div>
