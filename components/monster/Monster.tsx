@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Fragment } from "react";
 import reactStringReplace from "react-string-replace";
 import { toast } from "sonner";
 import { create } from "mutative";
@@ -312,7 +312,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
 
   return (
     <>
-      {actions.map(a => {
+      {actions.map((a, index) => {
         return (
           <div id="actions" className="py-2" key={a.title}>
             <h3 className="text-2xl font-light text-red-900">{a.title}</h3>
@@ -350,7 +350,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                 );
 
                 return (
-                  <React.Fragment key={`${d.name}-${i}`}>
+                  <Fragment key={`${d.name}-${index}-${i}`}>
                     {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                     {/* {d.description} */}
                     {/* {newDescription} */}
@@ -376,7 +376,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                           return null; // Return nothing if no match
                         })()} */}
                     <br />
-                  </React.Fragment>
+                  </Fragment>
                 );
               })}
             </div>
