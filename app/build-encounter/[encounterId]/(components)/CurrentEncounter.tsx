@@ -24,28 +24,30 @@ import { createEncounterJsonDB, setEncounterJsonDB } from "../actions";
 import EncounterInfo from "./EncounterInfo";
 import { Input } from "@/components/ui/input";
 
-type Props = { id: number | typeof NaN; name: string };
+type Props = { id: number | typeof NaN };
 
-export default function CurrentEncounter({ id, name }: Props) {
-  const { encounterJson, setEncounterJson } = useEncounterContext();
+export default function CurrentEncounter({ id }: Props) {
+  const { encounter, setEncounter } = useEncounterContext();
   const { encounterSaved, setEncounterSaved } = useEncounterSavedContext();
-  const [encounterName, setEncounterName] = useState(name ?? "");
+  const [encounterName, setEncounterName] = useState(encounter.name ?? "");
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    const result = encounterJson.reduce((acc, item) => {
-      acc[item.id] = item.quantity;
-      return acc;
-    }, {} as EncounterJson);
-    try {
-      isNaN(id)
-        ? await createEncounterJsonDB(result, encounterName)
-        : await setEncounterJsonDB(id, result, encounterName);
-      toast.success("Encounter Saved", { position: "top-center" });
-      setEncounterSaved(true);
-    } catch {
-      toast.error("Error: Encounter Not saved");
-    }
+    // const result = encounterJson.reduce((acc, item) => {
+    //   acc[item.id] = item.quantity;
+    //   return acc;
+    // }, {} as EncounterJson);
+    // try {
+    //   isNaN(id)
+    //     ? await createEncounterJsonDB(result, encounterName)
+    //     : await setEncounterJsonDB(id, result, encounterName);
+    //   toast.success("Encounter Saved", { position: "top-center" });
+    //   setEncounterSaved(true);
+    // } catch {
+    //   toast.error("Error: Encounter Not saved");
+    // }
+    console.log(encounter);
   };
+
   return (
     <>
       {/* Desktop View */}
@@ -55,11 +57,11 @@ export default function CurrentEncounter({ id, name }: Props) {
             type="text"
             placeholder="Encounter Name"
             className="w-full"
-            defaultValue={name ?? ""}
+            defaultValue={encounter.name ?? ""}
             onChange={e => setEncounterName(e.target.value)}
           />
 
-          <EncounterInfo />
+          {/* <EncounterInfo /> */}
           <Button onClick={handleSave} disabled={!encounterName} className="w-full relative">
             {!encounterSaved && (
               <span className="top-[-0.25rem] right-[-0.25rem] absolute  w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />

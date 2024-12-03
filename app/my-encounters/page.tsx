@@ -2,15 +2,15 @@ import React from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 
-// import { getMyEncounters } from "@/data-access/encounters";
-import { getMyEncounterJsons } from "@/data-access/encounter_json";
+import { getMyEncounters } from "@/data-access/encounters";
+// import { getMyEncounterJsons } from "@/data-access/encounter_json";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pencil, Play, Plus } from "lucide-react";
 
 export default async function MyEncounters() {
-  // const encounters = await getMyEncounters();
-  const encounters = await getMyEncounterJsons();
+  const encounters = await getMyEncounters();
+  // const encounters = await getMyEncounterJsons();
   if (!encounters) {
     return <div>No encounters found.</div>;
   }

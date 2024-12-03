@@ -1,24 +1,51 @@
 "use client";
+import { Dispatch, SetStateAction } from "react";
 import { createContext, useContext, useState, ReactNode } from "react";
-import { type FormattedEncounterJson } from "@/types/encounterJsonTypes";
+import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
 
 type encounterContextValue = {
-  encounterJson: FormattedEncounterJson[];
-  setEncounterJson: React.Dispatch<React.SetStateAction<FormattedEncounterJson[]>>;
+  encounter: Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>;
+  setEncounter: Dispatch<
+    SetStateAction<Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>>
+  >;
 };
 export const EncounterContext = createContext<encounterContextValue | null>(null);
 
 export const EncounterContextProvider = ({
   children,
-  initialEncounterJson,
+  initialEncounter,
 }: {
   children: ReactNode;
-  initialEncounterJson: FormattedEncounterJson[];
+  initialEncounter: Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>;
 }) => {
-  const [encounterJson, setEncounterJson] =
-    useState<FormattedEncounterJson[]>(initialEncounterJson);
+  const [encounter, setEncounter] =
+    useState<Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>>(initialEncounter);
+
+  const addMonster = async (monsterId: number, monsterName: string) => {
+    const newMonster = {
+      encounter_id: encounter.id, // Assuming the `id` of the encounter is included
+      monster_id: monsterId,
+    };
+
+    // Update the database
+    const { data, error } = await supabase.from("encounter_monsters").insert([newMonster]);
+
+    if (error) {
+      console.error("Failed to add monster:", error);
+      return;
+    }
+
+    // Update the context state
+    setEncounter(prev => ({
+      ...prev,
+      encounter_monsters: [
+        ...prev.encounter_monsters,
+        { id: data[0].id, monsters: { id: monsterId, name: monsterName } },
+      ],
+    }));
+  };
   return (
-    <EncounterContext.Provider value={{ encounterJson, setEncounterJson }}>
+    <EncounterContext.Provider value={{ encounter, setEncounter }}>
       {children}
     </EncounterContext.Provider>
   );

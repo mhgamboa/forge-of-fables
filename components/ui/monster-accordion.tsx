@@ -50,25 +50,26 @@ const AccordionTrigger = React.forwardRef<
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const EncounterInteract = ({ monster }: { monster: Tables<"monsters"> }) => {
-  const { encounterJson, setEncounterJson } = useEncounterContext();
+  // const { encounterJson, setEncounterJson } = useEncounterContext();
+  const { encounter, setEncounter } = useEncounterContext();
   const { encounterSaved, setEncounterSaved } = useEncounterSavedContext();
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
     const id = monster.id;
-
-    const hasId = encounterJson.find(m => m.id === id);
-    if (hasId) {
-      // if hasId then add 1 to quantity without modifying original encounterJson
-      const index = encounterJson.findIndex(m => m.id === id);
-      setEncounterJson([
-        ...encounterJson.slice(0, index),
-        { ...encounterJson[index], quantity: encounterJson[index].quantity + 1 },
-        ...encounterJson.slice(index + 1),
-      ]);
-    } else {
-      setEncounterJson([...encounterJson, { id, name: monster.name, quantity: 1 }]);
-    }
-    setEncounterSaved(false);
+    console.log(encounter);
+    // const hasId = encounterJson.find(m => m.id === id);
+    // if (hasId) {
+    //   // if hasId then add 1 to quantity without modifying original encounterJson
+    //   const index = encounterJson.findIndex(m => m.id === id);
+    //   setEncounterJson([
+    //     ...encounterJson.slice(0, index),
+    //     { ...encounterJson[index], quantity: encounterJson[index].quantity + 1 },
+    //     ...encounterJson.slice(index + 1),
+    //   ]);
+    // } else {
+    //   setEncounterJson([...encounterJson, { id, name: monster.name, quantity: 1 }]);
+    // }
+    // setEncounterSaved(false);
   };
   return (
     <div onClick={handleClick} className="hover:bg-foreground/10 rounded-md p-2">

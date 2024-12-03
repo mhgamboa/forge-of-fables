@@ -12,33 +12,35 @@ import CurrentEncounter from "./(components)/CurrentEncounter";
 import SearchBar from "./(components)/SearchBar";
 import { QueryContextProvider } from "./(components)/QueryContext";
 import { getXMonsters } from "@/data-access/monster";
-
-type Params = Promise<{ encounterId: string }>;
-type SearchParams = Promise<{ query: string }>;
+import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
 
 type Props = {
-  params: Params;
-  searchParams: SearchParams;
+  params: Promise<{ encounterId: string }>;
+  searchParams: Promise<{ query: string }>;
 };
 
 export default async function BuildEncounters(props: Props) {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const { encounterId } = params;
-
-  if (encounterId !== "new" && typeof parseInt(encounterId) !== "number")
-    redirect("/build-encounter/new");
-
-  const query = searchParams?.query || "";
   const id = parseInt(encounterId);
+  const query = searchParams?.query || "";
 
-  const encounterName = id ? await getEncounterJsonName(id) : "";
-  const encounterJson = id ? await getEncounterMonsters(id) : [];
+  // If not valid number, redirect to new encounter
+  if (encounterId !== "new" && typeof id !== "number") redirect("/build-encounter/new");
+
+  const encounter = id
+    ? await getSingleEncounterWithMonsters(id)
+    : { name: "", description: "", encounter_monsters: [], encounter_players: [] };
+  if (!encounter) redirect("/build-encounter/new");
+
+  // const encounterName = id ? await getEncounterJsonName(id) : "";
+  // const encounterJson = id ? await getEncounterMonsters(id) : [];
   const monsters = await getXMonsters();
 
   return (
     <EncounterSavedContextProvider>
-      <EncounterContextProvider initialEncounterJson={encounterJson}>
+      <EncounterContextProvider initialEncounter={encounter}>
         <QueryContextProvider initialQuery={query}>
           <SearchBar />
           <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -46,7 +48,7 @@ export default async function BuildEncounters(props: Props) {
               {/* <MonsterList query={query} /> */}
               <MonsterList monsters={monsters} />
             </Suspense>
-            <CurrentEncounter id={id} name={encounterName} />
+            <CurrentEncounter id={id} />
           </div>
         </QueryContextProvider>
       </EncounterContextProvider>
