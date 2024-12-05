@@ -7,6 +7,7 @@ import { getMyEncounters } from "@/data-access/encounters";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pencil, Play, Plus } from "lucide-react";
+import NewEncounterCard from "./components/newEncounterCard";
 
 export default async function MyEncounters() {
   const encounters = await getMyEncounters();
@@ -19,11 +20,7 @@ export default async function MyEncounters() {
     <div>
       <h1 className="text-4xl font-bold mb-3">My encounters</h1>
       <div className="gap-y-3 grid grid-cols-1 sm:gap-x-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Link href="/build-encounter">
-          <Card className="cursor-pointer flex items-center justify-center min-h-24 h-full">
-            <Plus />
-          </Card>
-        </Link>
+        <NewEncounterCard />
         {encounters.map(e => {
           const parsedDate = parseISO(e.created_at);
           const formattedDate = format(parsedDate, "MM/dd/yy");

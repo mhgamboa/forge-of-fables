@@ -5,8 +5,9 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 export const authenticateUser = async (client?: SupabaseClient<any, "public", any>) => {
   const supabase = client ?? (await createClient());
-  // const supabase = await createClient();
+
   const { data, error } = await supabase.auth.getUser();
+
   if (error) {
     console.error("getUser", error);
     redirect("/sign-in");

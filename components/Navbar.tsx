@@ -22,9 +22,9 @@ import { CircleArrowLeft, Menu, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // TODO: Update Shadcn Sonner?
 const NavLinks = [
-  { name: "My Encounters", href: "/my-encounters" },
-  { name: "My Monsters", href: "/my-monsters" },
-  { name: "Import Monster", href: "/import-monster" },
+  { name: "My Encounters", href: "/my-encounters", prefetch: true },
+  { name: "My Monsters", href: "/my-monsters", prefetch: false },
+  { name: "Import Monster", href: "/import-monster", prefetch: true },
 ];
 
 const EncounterLinks = [
@@ -82,7 +82,7 @@ export default function Component() {
                     key={link.name}
                     href={link.href}
                     className="flex w-full items-center py-2 text-lg font-semibold"
-                    prefetch={false}
+                    prefetch={link.prefetch}
                   >
                     <SheetClose>{link.name}</SheetClose>
                   </Link>
@@ -111,7 +111,7 @@ export default function Component() {
               <Link
                 key={link.name}
                 href={link.href}
-                prefetch={false}
+                prefetch={link.prefetch}
                 className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
               >
                 {link.name}

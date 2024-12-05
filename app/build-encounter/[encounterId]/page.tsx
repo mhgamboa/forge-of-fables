@@ -13,30 +13,29 @@ import SearchBar from "./(components)/SearchBar";
 import { QueryContextProvider } from "./(components)/QueryContext";
 import { getXMonsters } from "@/data-access/monster";
 import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
+import { parse } from "path";
 
 type Props = {
   params: Promise<{ encounterId: string }>;
   searchParams: Promise<{ query: string }>;
 };
 
-export default async function BuildEncounters(props: Props) {
-  const params = await props.params;
-  const searchParams = await props.searchParams;
-  const { encounterId } = params;
+export default async function BuildEncounters({ params, searchParams }: Props) {
+  const encounterId = (await params).encounterId;
+  const query = (await searchParams).query || "";
+
   const id = parseInt(encounterId);
-  const query = searchParams?.query || "";
-
+  const numberRegex = /^\d+$/;
   // If not valid number, redirect to new encounter
-  if (encounterId !== "new" && typeof id !== "number") redirect("/build-encounter/new");
+  if (!numberRegex.test(encounterId) || id <= 0) redirect("/my-encounters");
 
-  const encounter = id
-    ? await getSingleEncounterWithMonsters(id)
-    : { name: "", description: "", encounter_monsters: [], encounter_players: [] };
-  if (!encounter) redirect("/build-encounter/new");
+  // Start fetching encounter and monsters simultaneously
+  const [encounter, monsters] = await Promise.all([
+    getSingleEncounterWithMonsters(id),
+    getXMonsters(),
+  ]);
 
-  // const encounterName = id ? await getEncounterJsonName(id) : "";
-  // const encounterJson = id ? await getEncounterMonsters(id) : [];
-  const monsters = await getXMonsters();
+  if (!encounter) redirect("/my-encounters");
 
   return (
     <EncounterSavedContextProvider>

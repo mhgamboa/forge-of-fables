@@ -40,13 +40,14 @@ export const getSingleEncounterWithMonsters = async (encounterId: number) => {
   const { data: encounter } = await supabase
     .from("encounters")
     .select(
-      `name,
-      description,
-      encounter_monsters (
-        id,
-        monsters (name, id)
-      ),
-      encounter_players (id, name)`
+      `id,
+        name,
+        description,
+        encounter_monsters (
+          id,
+          monsters (name, id)
+        ),
+        encounter_players (id, name)`
     )
     .eq("id", encounterId)
     .eq("user_id", user_id)
