@@ -4,10 +4,12 @@ import { create } from "mutative";
 import { EncounterMonstersType, useEncounterContext } from "@/context/build-encouter-context";
 
 import { Undo, X } from "lucide-react";
+import { useHandleSaveEncounter } from "@/hooks/useHandleSaveEncounter";
 
 export default function EncounterInfo() {
   const { encounter, setEncounter } = useEncounterContext();
 
+  useHandleSaveEncounter();
   const removeMonster = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     monster: EncounterMonstersType
