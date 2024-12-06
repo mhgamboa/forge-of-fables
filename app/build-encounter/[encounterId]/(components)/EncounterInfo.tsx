@@ -4,12 +4,10 @@ import { create } from "mutative";
 import { EncounterMonstersType, useEncounterContext } from "@/context/build-encouter-context";
 
 import { Undo, X } from "lucide-react";
-import { useHandleSaveEncounter } from "@/hooks/useHandleSaveEncounter";
 
 export default function EncounterInfo() {
   const { encounter, setEncounter } = useEncounterContext();
 
-  useHandleSaveEncounter();
   const removeMonster = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     monster: EncounterMonstersType
@@ -63,9 +61,7 @@ export default function EncounterInfo() {
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col gap-y-2 w-full">
-        <h2 className="text-center text-md lg:text-2xl font-bold text-gray-800 pb-2">
-          Monsters
-        </h2>
+        <h2 className="text-center text-md lg:text-2xl font-bold text-gray-800 pb-2">Monsters</h2>
         {encounter.encounter_monsters.map(m => {
           return (
             <div key={m.id} className="flex justify-between w-full border p-2 rounded-md">
@@ -98,10 +94,7 @@ export default function EncounterInfo() {
             </h2>
             {encounter.encounter_monstersToBeAdded.map(m => {
               return (
-                <div
-                  key={m.tempId}
-                  className="flex justify-between w-full border p-2 rounded-md"
-                >
+                <div key={m.tempId} className="flex justify-between w-full border p-2 rounded-md">
                   <p>{m.name}</p>
                   <div className="flex">
                     <button onClick={e => unAddMonster(e, m)}>

@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { useEncounterContext } from "@/context/build-encouter-context";
-import { useEncounterSavedContext } from "@/context/encounter-saved-context";
 
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,31 +19,41 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-// import { EncounterJson, FormattedEncounterJson } from "@/types/encounterJsonTypes";
-// import { createEncounterJsonDB, setEncounterJsonDB } from "../actions";
 import EncounterInfo from "./EncounterInfo";
 import { Input } from "@/components/ui/input";
+import { useHandleSaveEncounter } from "@/hooks/useHandleSaveEncounter";
+import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
+import { createEncounter_monster } from "@/actions/encounter_monsterActions";
 
 export default function CurrentEncounter() {
   const { encounter, setEncounter } = useEncounterContext();
-  // const { encounterSaved, setEncounterSaved } = useEncounterSavedContext();
+  useHandleSaveEncounter();
+
   const [encounterName, setEncounterName] = useState(encounter.name ?? "");
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    // const result = encounterJson.reduce((acc, item) => {
-    //   acc[item.id] = item.quantity;
-    //   return acc;
-    // }, {} as EncounterJson);
-    // try {
-    //   isNaN(id)
-    //     ? await createEncounterJsonDB(result, encounterName)
-    //     : await setEncounterJsonDB(id, result, encounterName);
-    //   toast.success("Encounter Saved", { position: "top-center" });
-    //   setEncounterSaved(true);
-    // } catch {
-    //   toast.error("Error: Encounter Not saved");
-    // }
-    console.log(encounter);
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.getSession();
+
+    const userId = data.session?.user.id;
+    if (!data || error) {
+      const router = useRouter();
+      router.push("/login");
+      toast.error("You must be logged in to save your encounter");
+      return;
+    }
+
+    const res = await Promise.allSettled([
+      createEncounter_monster(encounter.encounter_monstersToBeAdded, encounter.id, userId),
+    ]);
+
+    // TODO: Filter Res. If any rejected, show error toast. If all resolved, show success toast
+    if (res[0].status === "rejected")
+      toast.error("Error: Encounter Not saved", { position: "top-center" });
+    else toast.success("Encounter Saved", { position: "top-center" });
+
+    // TODO: Update encounterSaved state. Router.Refresh()?
   };
 
   return (
@@ -60,7 +70,11 @@ export default function CurrentEncounter() {
           />
 
           <EncounterInfo />
-          <Button onClick={handleSave} disabled={!encounterName} className="w-full relative">
+          <Button
+            onClick={handleSave}
+            disabled={encounter.encounterSaved}
+            className={cn("w-full relative", encounter.encounterSaved && "cursor-not-allowed")}
+          >
             {!encounter.encounterSaved && (
               <span className="top-[-0.25rem] right-[-0.25rem] absolute  w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
             )}
@@ -99,7 +113,7 @@ export default function CurrentEncounter() {
           <EncounterInfo />
           <SheetFooter className="mt-4 flex justify-center">
             <SheetClose asChild>
-              <Button onClick={handleSave} className="w-full">
+              <Button onClick={handleSave} className="w-full" disabled={encounter.encounterSaved}>
                 {!encounter.encounterSaved && (
                   <span className="relative left-[13.25rem] bottom-5 w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
                 )}
