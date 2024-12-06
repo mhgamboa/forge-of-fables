@@ -6,5 +6,5 @@ export default async function page() {
   const user = await supabase.auth.getUser();
   if (user.error) redirect("/sign-in");
 
-  redirect("/build-encounter/new");
+  redirect("/my-encounters");
 }

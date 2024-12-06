@@ -16,10 +16,11 @@ import { useQueryContext } from "./QueryContext";
 import { set } from "date-fns";
 
 export default function MonsterList({ monsters }: { monsters: Tables<"monsters">[] | null }) {
+  // TODO: Query monsters here instead of in parent component?
   const { query } = useQueryContext();
   const [filteredMonsters, setFilteredMonsters] = useState<Tables<"monsters">[]>(monsters!);
 
-  if (!monsters) return <div>There are no monsters :(</div>;
+  if (!monsters) return <div>There are no monsters 😞</div>;
 
   useEffect(() => {
     setFilteredMonsters(monsters);

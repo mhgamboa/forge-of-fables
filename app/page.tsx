@@ -18,7 +18,7 @@ export default function LandingPage() {
                 Less time Fumbling, and more time Rumbling.
               </p>
               <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <Link href="/build-encounter/new" prefetch={false}>
+                <Link href="/my-encounters" prefetch={false}>
                   <Button className="bg-white hover:bg-gray-100 text-black border border-gray-200 rounded-full text-lg px-8 py-4 inline-flex items-center justify-center">
                     Get Started
                     <ArrowRight className="ml-2 h-5 w-5" />

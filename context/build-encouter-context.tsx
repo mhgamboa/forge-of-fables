@@ -1,27 +1,38 @@
+// /context/EncounterContext.tsx
 "use client";
-import { Dispatch, SetStateAction } from "react";
-import { createContext, useContext, useState, ReactNode } from "react";
+import { Dispatch, SetStateAction, createContext, useContext, useState, ReactNode } from "react";
 import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
 import { Tables } from "@/types/database.types";
 
-type EncounterContextType = Awaited<ReturnType<typeof getSingleEncounterWithMonsters>> & {
-  encounter_monstersToBeAdded: number[];
-  encounter_monstersToBeRemoved: number[];
-  encounter_monstersToBeUpdated: Tables<"encounter_monsters">[]; // Need to update
-  encounter_playersToBeAdded: number[];
-  encounter_playersToBeRemoved: number[];
-  encounter_playersToBeUpdated: number[]; // Need to update
+export type EncounterMonstersType = {
+  id: number;
+  notes: string | null;
+  monsters: { name: string; id: number } | null;
+}; // Return type of getSingleEncounterWithMonsters.encounterMonsters
+
+export type EncounterPlayersType = {
+  id: number;
+  name: string;
 };
 
-type encounterContextValue = {
-  // encounter: Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>;
+type EncounterContextType = Awaited<ReturnType<typeof getSingleEncounterWithMonsters>> & {
+  newEncounterName: string;
+  newEncounterDescription: string;
+  encounter_monstersToBeAdded: { id: number; name: string; tempId: number }[];
+  encounter_monstersToBeRemoved: EncounterMonstersType[];
+  encounter_monstersToBeUpdated: Tables<"encounter_monsters">[];
+  encounter_playersToBeAdded: number[];
+  encounter_playersToBeRemoved: number[];
+  encounter_playersToBeUpdated: Tables<"encounter_players">[];
+  encounterSaved: boolean;
+};
+
+type EncounterContextValue = {
   encounter: EncounterContextType;
   setEncounter: Dispatch<SetStateAction<EncounterContextType>>;
-  // setEncounter: Dispatch<
-  //   SetStateAction<Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>>
-  // >;
 };
-export const EncounterContext = createContext<encounterContextValue | null>(null);
+
+export const EncounterContext = createContext<EncounterContextValue | null>(null);
 
 export const EncounterContextProvider = ({
   children,
@@ -30,16 +41,20 @@ export const EncounterContextProvider = ({
   children: ReactNode;
   initialEncounter: Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>;
 }) => {
-  const formattedInitialEncounter = {
+  const initializeEncounter = (): EncounterContextType => ({
     ...initialEncounter,
+    newEncounterName: "",
+    newEncounterDescription: "",
     encounter_monstersToBeAdded: [],
     encounter_monstersToBeRemoved: [],
     encounter_monstersToBeUpdated: [],
     encounter_playersToBeAdded: [],
     encounter_playersToBeRemoved: [],
     encounter_playersToBeUpdated: [],
-  };
-  const [encounter, setEncounter] = useState<EncounterContextType>(formattedInitialEncounter);
+    encounterSaved: true,
+  });
+
+  const [encounter, setEncounter] = useState<EncounterContextType>(initializeEncounter);
 
   return (
     <EncounterContext.Provider value={{ encounter, setEncounter }}>
@@ -49,7 +64,10 @@ export const EncounterContextProvider = ({
 };
 
 export const useEncounterContext = () => {
-  const encounter = useContext(EncounterContext);
-  if (encounter === null) throw new Error("no encounter context");
-  return encounter;
+  const context = useContext(EncounterContext);
+  if (!context)
+    throw new Error(
+      "EncounterContext is not provided. Wrap your component in <EncounterContextProvider>."
+    );
+  return context;
 };

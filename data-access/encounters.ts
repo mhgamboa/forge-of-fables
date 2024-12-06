@@ -45,6 +45,7 @@ export const getSingleEncounterWithMonsters = async (encounterId: number) => {
         description,
         encounter_monsters (
           id,
+          notes,
           monsters (name, id)
         ),
         encounter_players (id, name)`
@@ -52,7 +53,8 @@ export const getSingleEncounterWithMonsters = async (encounterId: number) => {
     .eq("id", encounterId)
     .eq("user_id", user_id)
     .single();
-  if (!encounter) return redirect("/build-encounter/new");
+
+  if (!encounter) return redirect("/my-encounters");
 
   return encounter;
 };

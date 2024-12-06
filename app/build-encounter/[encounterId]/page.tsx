@@ -13,7 +13,6 @@ import SearchBar from "./(components)/SearchBar";
 import { QueryContextProvider } from "./(components)/QueryContext";
 import { getXMonsters } from "@/data-access/monster";
 import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
-import { parse } from "path";
 
 type Props = {
   params: Promise<{ encounterId: string }>;
@@ -27,6 +26,7 @@ export default async function BuildEncounters({ params, searchParams }: Props) {
   const id = parseInt(encounterId);
   const numberRegex = /^\d+$/;
   // If not valid number, redirect to new encounter
+  console.log(id);
   if (!numberRegex.test(encounterId) || id <= 0) redirect("/my-encounters");
 
   // Start fetching encounter and monsters simultaneously
@@ -38,20 +38,20 @@ export default async function BuildEncounters({ params, searchParams }: Props) {
   if (!encounter) redirect("/my-encounters");
 
   return (
-    <EncounterSavedContextProvider>
-      <EncounterContextProvider initialEncounter={encounter}>
-        <QueryContextProvider initialQuery={query}>
-          <SearchBar />
-          <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Suspense fallback={<FallBack />}>
-              {/* <MonsterList query={query} /> */}
-              <MonsterList monsters={monsters} />
-            </Suspense>
-            <CurrentEncounter id={id} />
-          </div>
-        </QueryContextProvider>
-      </EncounterContextProvider>
-    </EncounterSavedContextProvider>
+    // <EncounterSavedContextProvider>
+    <EncounterContextProvider initialEncounter={encounter}>
+      <QueryContextProvider initialQuery={query}>
+        <SearchBar />
+        <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Suspense fallback={<FallBack />}>
+            {/* <MonsterList query={query} /> */}
+            <MonsterList monsters={monsters} />
+          </Suspense>
+          <CurrentEncounter />
+        </div>
+      </QueryContextProvider>
+    </EncounterContextProvider>
+    // </EncounterSavedContextProvider>
   );
 }
 
