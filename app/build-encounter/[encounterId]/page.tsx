@@ -26,7 +26,6 @@ export default async function BuildEncounters({ params, searchParams }: Props) {
   const id = parseInt(encounterId);
   const numberRegex = /^\d+$/;
   // If not valid number, redirect to new encounter
-  console.log(id);
   if (!numberRegex.test(encounterId) || id <= 0) redirect("/my-encounters");
 
   // Start fetching encounter and monsters simultaneously

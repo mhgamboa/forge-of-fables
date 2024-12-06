@@ -16,7 +16,6 @@ export default function NewEncounterCard() {
     setLoading(true);
     try {
       const res = await createEncounter("New Encounter", "This is a new encounter");
-      console.log(res);
       router.push(`/build-encounter/${res.id}`);
       toast.success("Encounter Created", { position: "top-center" });
     } catch {
