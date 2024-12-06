@@ -24,7 +24,10 @@ import { Input } from "@/components/ui/input";
 import { useHandleSaveEncounter } from "@/hooks/useHandleSaveEncounter";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
-import { createEncounter_monster } from "@/actions/encounter_monsterActions";
+import {
+  createEncounter_monsters,
+  deleteEncounter_monsters,
+} from "@/actions/encounter_monsterActions";
 
 export default function CurrentEncounter() {
   const { encounter, setEncounter } = useEncounterContext();
@@ -35,25 +38,29 @@ export default function CurrentEncounter() {
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const supabase = createClient();
     const { data, error } = await supabase.auth.getSession();
+    const router = useRouter();
 
     const userId = data.session?.user.id;
     if (!data || error) {
-      const router = useRouter();
       router.push("/login");
       toast.error("You must be logged in to save your encounter");
       return;
     }
 
     const res = await Promise.allSettled([
-      createEncounter_monster(encounter.encounter_monstersToBeAdded, encounter.id, userId),
+      createEncounter_monsters(encounter.encounter_monstersToBeAdded, encounter.id, userId),
+      deleteEncounter_monsters(encounter.encounter_monstersToBeRemoved, userId),
     ]);
+    router.refresh();
 
-    // TODO: Filter Res. If any rejected, show error toast. If all resolved, show success toast
-    if (res[0].status === "rejected")
-      toast.error("Error: Encounter Not saved", { position: "top-center" });
-    else toast.success("Encounter Saved", { position: "top-center" });
+    let errorMessages: string[] = [];
+    if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not added");
+    if (res[1].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
 
-    // TODO: Update encounterSaved state. Router.Refresh()?
+    if (errorMessages.length === 0) toast.success("Encounter Saved", { position: "top-center" });
+    if (errorMessages.length === 2)
+      toast.error("Encounter Not saved", { position: "top-center" });
+    else toast.error(errorMessages.join("\n"), { position: "top-center" });
   };
 
   return (
@@ -113,7 +120,11 @@ export default function CurrentEncounter() {
           <EncounterInfo />
           <SheetFooter className="mt-4 flex justify-center">
             <SheetClose asChild>
-              <Button onClick={handleSave} className="w-full" disabled={encounter.encounterSaved}>
+              <Button
+                onClick={handleSave}
+                className="w-full"
+                disabled={encounter.encounterSaved}
+              >
                 {!encounter.encounterSaved && (
                   <span className="relative left-[13.25rem] bottom-5 w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
                 )}
