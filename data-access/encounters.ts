@@ -48,7 +48,7 @@ export const getSingleEncounterWithMonsters = async (encounterId: number) => {
           notes,
           monsters (name, id)
         ),
-        encounter_players (id, name)`
+        encounter_players (id, name, notes)`
     )
     .eq("id", encounterId)
     .eq("user_id", user_id)

@@ -9,7 +9,6 @@ import { useEncounterContext } from "@/context/build-encouter-context";
 
 import { cn } from "@/lib/utils";
 import { Tables } from "@/types/database.types";
-import { useEncounterSavedContext } from "@/context/encounter-saved-context";
 const Accordion = AccordionPrimitive.Root;
 
 const AccordionItem = React.forwardRef<
@@ -58,6 +57,7 @@ const EncounterInteract = ({ monster }: { monster: Tables<"monsters"> }) => {
     const tempId = Math.floor(Math.random() * 1000000);
     const nextState = create(encounter, draft => {
       draft.encounter_monstersToBeAdded.push({ id, name, tempId });
+      draft.encounterSaved = false;
     });
     setEncounter(nextState);
   };

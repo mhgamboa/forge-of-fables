@@ -1,9 +1,9 @@
 "use server";
 import { authenticateUser } from "@/data-access/auth";
 import { createClient } from "@/utils/supabase/server";
-import { type EncounterMonstersType } from "@/context/build-encouter-context";
+import { encounterMonstersToBeAddedType, type EncounterMonstersType } from "@/types/buildEncounter";
 
-type MonsterArr = { id: number; name: string; tempId: number }[];
+type MonsterArr = encounterMonstersToBeAddedType[];
 
 export const createEncounter_monsters = async (
   arr: MonsterArr,
@@ -16,10 +16,7 @@ export const createEncounter_monsters = async (
   const { id: user_id } = userId ? { id: userId } : await authenticateUser(supabase);
   const formattedArr = arr.map(obj => ({ encounter_id, monster_id: obj.id, user_id }));
 
-  const { data, error } = await supabase
-    .from("encounter_monsters")
-    .insert(formattedArr)
-    .select();
+  const { data, error } = await supabase.from("encounter_monsters").insert(formattedArr).select();
   if (error) {
     console.error("createEncounter_monster", error);
     throw error;
@@ -27,10 +24,7 @@ export const createEncounter_monsters = async (
   return data;
 };
 
-export const deleteEncounter_monsters = async (
-  arr: EncounterMonstersType[],
-  userId?: string
-) => {
+export const deleteEncounter_monsters = async (arr: EncounterMonstersType[], userId?: string) => {
   if (arr.length === 0) return;
   const supabase = await createClient();
 

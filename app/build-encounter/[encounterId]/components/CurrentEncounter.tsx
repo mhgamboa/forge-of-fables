@@ -28,39 +28,49 @@ import {
   createEncounter_monsters,
   deleteEncounter_monsters,
 } from "@/actions/encounter_monsterActions";
+import { handleSaveEncounter } from "@/utils/handleSaveEncounter";
 
 export default function CurrentEncounter() {
   const { encounter, setEncounter } = useEncounterContext();
   useHandleSaveEncounter();
+  const router = useRouter();
 
   const [encounterName, setEncounterName] = useState(encounter.name ?? "");
 
-  const handleSave = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.getSession();
-    const router = useRouter();
+  // const handleSave = async () => {
+  //   const supabase = createClient();
+  //   const { data, error } = await supabase.auth.getSession();
+  //   const router = useRouter();
 
-    const userId = data.session?.user.id;
-    if (!data || error) {
-      router.push("/login");
-      toast.error("You must be logged in to save your encounter");
-      return;
-    }
+  //   const userId = data.session?.user.id;
+  //   if (!data || error) {
+  //     router.push("/login");
+  //     toast.error("You must be logged in to save your encounter");
+  //     return;
+  //   }
 
-    const res = await Promise.allSettled([
-      createEncounter_monsters(encounter.encounter_monstersToBeAdded, encounter.id, userId),
-      deleteEncounter_monsters(encounter.encounter_monstersToBeRemoved, userId),
-    ]);
-    router.refresh();
+  //   const res = await Promise.allSettled([
+  //     createEncounter_monsters(encounter.encounter_monstersToBeAdded, encounter.id, userId),
+  //     deleteEncounter_monsters(encounter.encounter_monstersToBeRemoved, userId),
+  //   ]);
+  //   router.refresh();
 
-    let errorMessages: string[] = [];
-    if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not added");
-    if (res[1].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
+  //   let errorMessages: string[] = [];
+  //   if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not added");
+  //   if (res[1].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
 
-    if (errorMessages.length === 0) toast.success("Encounter Saved", { position: "top-center" });
-    if (errorMessages.length === 2)
-      toast.error("Encounter Not saved", { position: "top-center" });
-    else toast.error(errorMessages.join("\n"), { position: "top-center" });
+  //   if (errorMessages.length === 0) toast.success("Encounter Saved", { position: "top-center" });
+  //   else if (errorMessages.length === 2)
+  //     toast.error("Encounter Not saved", { position: "top-center" });
+  //   else toast.warning(errorMessages.join("\n"), { position: "top-center" });
+  // };
+
+  const handleSave = () => {
+    handleSaveEncounter({
+      encounter,
+      setEncounter,
+      router,
+    });
   };
 
   return (
@@ -121,7 +131,7 @@ export default function CurrentEncounter() {
           <SheetFooter className="mt-4 flex justify-center">
             <SheetClose asChild>
               <Button
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 className="w-full"
                 disabled={encounter.encounterSaved}
               >

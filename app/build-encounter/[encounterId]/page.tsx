@@ -3,14 +3,11 @@ import { redirect } from "next/navigation";
 import { Loader } from "lucide-react";
 
 import { EncounterContextProvider } from "@/context/build-encouter-context";
-import { EncounterSavedContextProvider } from "@/context/encounter-saved-context";
 
-import { getEncounterJsonName, getEncounterMonsters } from "@/data-access/encounter_json";
-
-import MonsterList from "./(components)/MonsterList";
-import CurrentEncounter from "./(components)/CurrentEncounter";
-import SearchBar from "./(components)/SearchBar";
-import { QueryContextProvider } from "./(components)/QueryContext";
+import MonsterList from "./components/MonsterList";
+import CurrentEncounter from "./components/CurrentEncounter";
+import SearchBar from "./components/SearchBar";
+import { QueryContextProvider } from "./components/QueryContext";
 import { getXMonsters } from "@/data-access/monster";
 import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
 
@@ -37,7 +34,6 @@ export default async function BuildEncounters({ params, searchParams }: Props) {
   if (!encounter) redirect("/my-encounters");
 
   return (
-    // <EncounterSavedContextProvider>
     <EncounterContextProvider initialEncounter={encounter}>
       <QueryContextProvider initialQuery={query}>
         <SearchBar />
@@ -50,7 +46,6 @@ export default async function BuildEncounters({ params, searchParams }: Props) {
         </div>
       </QueryContextProvider>
     </EncounterContextProvider>
-    // </EncounterSavedContextProvider>
   );
 }
 

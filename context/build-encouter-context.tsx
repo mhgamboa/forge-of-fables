@@ -3,27 +3,22 @@
 import { Dispatch, SetStateAction, createContext, useContext, useState, ReactNode } from "react";
 import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
 import { Tables } from "@/types/database.types";
+import {
+  EncounterMonstersType,
+  encounterMonstersToBeAddedType,
+  EncounterPlayersType,
+  EncounterPlayersToBeAddedType,
+} from "@/types/buildEncounter";
 
-export type EncounterMonstersType = {
-  id: number;
-  notes: string | null;
-  monsters: { name: string; id: number } | null;
-}; // Return type of getSingleEncounterWithMonsters.encounterMonsters
-
-export type EncounterPlayersType = {
-  id: number;
-  name: string;
-};
-
-type EncounterContextType = Awaited<ReturnType<typeof getSingleEncounterWithMonsters>> & {
+export type EncounterContextType = Awaited<ReturnType<typeof getSingleEncounterWithMonsters>> & {
   newEncounterName: string;
   newEncounterDescription: string;
-  encounter_monstersToBeAdded: { id: number; name: string; tempId: number }[];
+  encounter_monstersToBeAdded: encounterMonstersToBeAddedType[];
   encounter_monstersToBeRemoved: EncounterMonstersType[];
   encounter_monstersToBeUpdated: Tables<"encounter_monsters">[];
-  encounter_playersToBeAdded: number[];
-  encounter_playersToBeRemoved: number[];
-  encounter_playersToBeUpdated: Tables<"encounter_players">[];
+  encounter_playersToBeAdded: EncounterPlayersToBeAddedType[];
+  encounter_playersToBeRemoved: EncounterPlayersType[];
+  encounter_playersToBeUpdated: EncounterPlayersType[];
   encounterSaved: boolean;
 };
 
