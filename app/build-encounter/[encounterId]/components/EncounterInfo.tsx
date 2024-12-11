@@ -59,6 +59,7 @@ export default function EncounterInfo() {
     setEncounter(nextState);
   };
 
+  // TODO: This page may be redundant? Consider consolidating children into CurrentEncounter
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col gap-y-2 w-full">

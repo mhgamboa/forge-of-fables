@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { useEncounterContext } from "@/context/build-encouter-context";
@@ -22,13 +21,11 @@ import {
 import EncounterInfo from "./EncounterInfo";
 import { Input } from "@/components/ui/input";
 import { useHandleSaveEncounter } from "@/hooks/useHandleSaveEncounter";
+// TODO: I have 2 cn functions: one in utils and lib. Let's consolidate them
 import { cn } from "@/lib/utils";
-import { createClient } from "@/utils/supabase/client";
-import {
-  createEncounter_monsters,
-  deleteEncounter_monsters,
-} from "@/actions/encounter_monsterActions";
 import { handleSaveEncounter } from "@/utils/handleSaveEncounter";
+
+// TODO: Segment Mobile and Desktop in to separate files
 
 export default function CurrentEncounter() {
   const { encounter, setEncounter } = useEncounterContext();
@@ -36,34 +33,6 @@ export default function CurrentEncounter() {
   const router = useRouter();
 
   const [encounterName, setEncounterName] = useState(encounter.name ?? "");
-
-  // const handleSave = async () => {
-  //   const supabase = createClient();
-  //   const { data, error } = await supabase.auth.getSession();
-  //   const router = useRouter();
-
-  //   const userId = data.session?.user.id;
-  //   if (!data || error) {
-  //     router.push("/login");
-  //     toast.error("You must be logged in to save your encounter");
-  //     return;
-  //   }
-
-  //   const res = await Promise.allSettled([
-  //     createEncounter_monsters(encounter.encounter_monstersToBeAdded, encounter.id, userId),
-  //     deleteEncounter_monsters(encounter.encounter_monstersToBeRemoved, userId),
-  //   ]);
-  //   router.refresh();
-
-  //   let errorMessages: string[] = [];
-  //   if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not added");
-  //   if (res[1].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
-
-  //   if (errorMessages.length === 0) toast.success("Encounter Saved", { position: "top-center" });
-  //   else if (errorMessages.length === 2)
-  //     toast.error("Encounter Not saved", { position: "top-center" });
-  //   else toast.warning(errorMessages.join("\n"), { position: "top-center" });
-  // };
 
   const handleSave = () => {
     handleSaveEncounter({
@@ -112,7 +81,7 @@ export default function CurrentEncounter() {
             <ChevronLeft className="" />
           </Button>
         </SheetTrigger>
-        <SheetContent>
+        <SheetContent className=" overflow-y-scroll">
           <SheetHeader className="mb-8 mt-4">
             <SheetTitle className="sr-only"> {encounterName}</SheetTitle>
             <Input
@@ -130,11 +99,7 @@ export default function CurrentEncounter() {
           <EncounterInfo />
           <SheetFooter className="mt-4 flex justify-center">
             <SheetClose asChild>
-              <Button
-                onClick={() => handleSave()}
-                className="w-full"
-                disabled={encounter.encounterSaved}
-              >
+              <Button onClick={handleSave} className="w-full" disabled={encounter.encounterSaved}>
                 {!encounter.encounterSaved && (
                   <span className="relative left-[13.25rem] bottom-5 w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
                 )}
