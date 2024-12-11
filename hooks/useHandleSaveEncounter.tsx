@@ -13,7 +13,8 @@ export const useHandleSaveEncounter = () => {
       encounter.encounter_monstersToBeUpdated.length ||
       encounter.encounter_playersToBeAdded.length ||
       encounter.encounter_playersToBeRemoved.length ||
-      encounter.encounter_playersToBeUpdated.length
+      encounter.encounter_playersToBeUpdated.length ||
+      encounter.newEncounterName
     ) {
       const nextState = create(encounter, draft => {
         draft.encounterSaved = false;

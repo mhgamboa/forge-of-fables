@@ -42,6 +42,13 @@ export default function CurrentEncounter() {
     });
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    encounter.name === e.target.value
+      ? setEncounter({ ...encounter, newEncounterName: "" })
+      : setEncounter({ ...encounter, newEncounterName: e.target.value });
+    console.log(encounter);
+  };
+
   return (
     <>
       {/* Desktop View */}
@@ -51,8 +58,8 @@ export default function CurrentEncounter() {
             type="text"
             placeholder="Encounter Name"
             className="w-full"
-            defaultValue={encounter.name ?? ""}
-            onChange={e => setEncounterName(e.target.value)}
+            defaultValue={encounter.name ?? encounter.newEncounterName ?? ""}
+            onChange={handleChange}
           />
 
           <EncounterInfo />
@@ -89,7 +96,7 @@ export default function CurrentEncounter() {
               placeholder="Encounter Name"
               className="w-full"
               defaultValue={encounter.name ?? ""}
-              onChange={e => setEncounterName(e.target.value)}
+              onChange={handleChange}
             />
             <SheetDescription>
               Make changes to your Encounter here. Click save when you're done.

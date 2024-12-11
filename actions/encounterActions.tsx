@@ -52,3 +52,37 @@ export const getEncounterWithJoins = async (encounterId: number) => {
 
   return encounter;
 };
+
+export const updateEncounter = async (
+  encounterId: number,
+  name: string,
+  description: string | null
+) => {
+  const supabase = await createClient();
+  const { id: user_id } = await authenticateUser(supabase);
+
+  // Create an object to hold the updates
+  const updates: any = {};
+
+  // Only add name and description if they are not empty
+  if (name) {
+    updates.name = name;
+  }
+  if (description) {
+    updates.description = description;
+  }
+
+  const { data, error } = await supabase
+    .from("encounters")
+    .update(updates)
+    .eq("id", encounterId)
+    .eq("user_id", user_id)
+    .select();
+
+  if (error) {
+    console.error("updateEncounter", error);
+    throw error;
+  }
+  if (!data) throw new Error("No data returned");
+  return data;
+};

@@ -13,7 +13,7 @@ import {
   deleteEncounter_players,
   updateEncounter_players,
 } from "@/actions/encounter_playerActions";
-import { getEncounterWithJoins } from "@/actions/encounterActions";
+import { getEncounterWithJoins, updateEncounter } from "@/actions/encounterActions";
 
 export interface EncounterSaveParams {
   encounter: EncounterContextType;
@@ -53,6 +53,13 @@ export async function handleSaveEncounter({
       encounter.encounter_playersToBeUpdated.length > 0
         ? updateEncounter_players(encounter.encounter_playersToBeUpdated, userId)
         : Promise.resolve({ status: "fulfilled" }),
+      encounter.newEncounterName || encounter.newEncounterDescription
+        ? updateEncounter(
+            encounter.id,
+            encounter.newEncounterName,
+            encounter.newEncounterDescription
+          )
+        : Promise.resolve({ status: "fulfilled" }),
     ]);
 
     let errorMessages: string[] = [];
@@ -73,13 +80,18 @@ export async function handleSaveEncounter({
     if (res[4].status === "rejected") errorMessages.push("Warning: Players were not updated");
     else updatedEncounter.encounter_playersToBeUpdated = [];
 
+    if (res[5].status === "rejected")
+      errorMessages.push("Warning: Encounter Name & Description was not updated");
+    else
+      (updatedEncounter.newEncounterName = "") &&
+        (updatedEncounter.newEncounterDescription = "undefined");
+
     // TODO: Instead of Querying the DB AGAIN, return values in promise.all and update encounter directly
     const newInitialEncounter = await getEncounterWithJoins(encounter.id);
     updatedEncounter.name = newInitialEncounter.name;
     updatedEncounter.description = newInitialEncounter.description;
     updatedEncounter.encounter_monsters = newInitialEncounter.encounter_monsters;
     updatedEncounter.encounter_players = newInitialEncounter.encounter_players;
-
     setEncounter(updatedEncounter);
 
     if (errorMessages.length === 0) toast.success("Encounter Saved", { position: "top-center" });
