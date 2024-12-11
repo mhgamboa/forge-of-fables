@@ -10,6 +10,7 @@ import {
   EncounterPlayersToBeAddedType,
 } from "@/types/buildEncounter";
 
+// TODO: Convert to Zustand to reduce re-renders
 export type EncounterContextType = InitialEncounter & {
   newEncounterName: string;
   newEncounterDescription: string;

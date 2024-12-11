@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 import { handleSaveEncounter } from "@/utils/handleSaveEncounter";
 
 // TODO: Segment Mobile and Desktop in to separate files
-
+// TODO: Add a loading state. Maybe to context?
 export default function CurrentEncounter() {
   const { encounter, setEncounter } = useEncounterContext();
   useHandleSaveEncounter();
@@ -62,7 +62,7 @@ export default function CurrentEncounter() {
             className={cn("w-full relative", encounter.encounterSaved && "cursor-not-allowed")}
           >
             {!encounter.encounterSaved && (
-              <span className="top-[-0.25rem] right-[-0.25rem] absolute  w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
+              <span className="top-[-0.25rem] right-[-0.25rem] absolute w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
             )}
             Save changes
           </Button>
@@ -99,9 +99,13 @@ export default function CurrentEncounter() {
           <EncounterInfo />
           <SheetFooter className="mt-4 flex justify-center">
             <SheetClose asChild>
-              <Button onClick={handleSave} className="w-full" disabled={encounter.encounterSaved}>
+              <Button
+                onClick={handleSave}
+                className="w-full relative"
+                disabled={encounter.encounterSaved}
+              >
                 {!encounter.encounterSaved && (
-                  <span className="relative left-[13.25rem] bottom-5 w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
                 )}
                 Save changes
               </Button>
