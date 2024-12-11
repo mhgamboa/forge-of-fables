@@ -13,8 +13,7 @@ import {
   deleteEncounter_players,
   updateEncounter_players,
 } from "@/actions/encounter_playerActions";
-import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
-import { create } from "mutative";
+import { getEncounterWithJoins } from "@/actions/encounterActions";
 
 export interface EncounterSaveParams {
   encounter: EncounterContextType;
@@ -27,7 +26,6 @@ export async function handleSaveEncounter({
   setEncounter,
   router,
 }: EncounterSaveParams) {
-  console.time("handleSaveEncounter");
   const supabase = createClient();
   const { data, error } = await supabase.auth.getSession();
 
@@ -40,32 +38,55 @@ export async function handleSaveEncounter({
 
   try {
     const res = await Promise.allSettled([
-      createEncounter_monsters(encounter.encounter_monstersToBeAdded, encounter.id, userId),
-      deleteEncounter_monsters(encounter.encounter_monstersToBeRemoved, userId),
-      createEncounter_players(encounter.encounter_playersToBeAdded, encounter.id, userId),
-      deleteEncounter_players(encounter.encounter_playersToBeRemoved, userId),
-      updateEncounter_players(encounter.encounter_playersToBeUpdated, userId),
+      encounter.encounter_monstersToBeAdded.length > 0
+        ? createEncounter_monsters(encounter.encounter_monstersToBeAdded, encounter.id, userId)
+        : Promise.resolve({ status: "fulfilled" }),
+      encounter.encounter_monstersToBeRemoved.length > 0
+        ? deleteEncounter_monsters(encounter.encounter_monstersToBeRemoved, userId)
+        : Promise.resolve({ status: "fulfilled" }),
+      encounter.encounter_playersToBeAdded.length > 0
+        ? createEncounter_players(encounter.encounter_playersToBeAdded, encounter.id, userId)
+        : Promise.resolve({ status: "fulfilled" }),
+      encounter.encounter_playersToBeRemoved.length > 0
+        ? deleteEncounter_players(encounter.encounter_playersToBeRemoved, userId)
+        : Promise.resolve({ status: "fulfilled" }),
+      encounter.encounter_playersToBeUpdated.length > 0
+        ? updateEncounter_players(encounter.encounter_playersToBeUpdated, userId)
+        : Promise.resolve({ status: "fulfilled" }),
     ]);
-    router.refresh();
 
     let errorMessages: string[] = [];
-    if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not added");
-    else setEncounter({ ...encounter, encounter_monstersToBeAdded: [] });
+    const updatedEncounter = { ...encounter };
+
+    if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
+    else updatedEncounter.encounter_monstersToBeAdded = [];
+
     if (res[1].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
-    else setEncounter({ ...encounter, encounter_monstersToBeRemoved: [] });
+    else updatedEncounter.encounter_monstersToBeRemoved = [];
+
     if (res[2].status === "rejected") errorMessages.push("Warning: Players were not added");
-    else setEncounter({ ...encounter, encounter_playersToBeAdded: [] });
+    else updatedEncounter.encounter_playersToBeAdded = [];
+
     if (res[3].status === "rejected") errorMessages.push("Warning: Players were not removed");
-    else setEncounter({ ...encounter, encounter_playersToBeRemoved: [] });
+    else updatedEncounter.encounter_playersToBeRemoved = [];
+
     if (res[4].status === "rejected") errorMessages.push("Warning: Players were not updated");
-    else setEncounter({ ...encounter, encounter_playersToBeUpdated: [] });
+    else updatedEncounter.encounter_playersToBeUpdated = [];
+
+    // TODO: Instead of Querying the DB AGAIN, return values in promise.all and update encounter directly
+    const newInitialEncounter = await getEncounterWithJoins(encounter.id);
+    updatedEncounter.name = newInitialEncounter.name;
+    updatedEncounter.description = newInitialEncounter.description;
+    updatedEncounter.encounter_monsters = newInitialEncounter.encounter_monsters;
+    updatedEncounter.encounter_players = newInitialEncounter.encounter_players;
+
+    setEncounter(updatedEncounter);
 
     if (errorMessages.length === 0) toast.success("Encounter Saved", { position: "top-center" });
     else if (errorMessages.length === 2)
       toast.error("Encounter Not saved", { position: "top-center" });
     else toast.warning(errorMessages.join("\n"), { position: "top-center" });
 
-    console.timeEnd("handleSaveEncounter");
     return { success: errorMessages.length === 0, errors: errorMessages };
   } catch (catchError) {
     toast.error("An unexpected error occurred", { position: "top-center" });

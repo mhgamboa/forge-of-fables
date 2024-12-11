@@ -1,3 +1,5 @@
+import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
+
 export type EncounterMonstersType = {
   id: number;
   notes: string | null;
@@ -19,3 +21,5 @@ export type EncounterPlayersToBeAddedType = {
   name: string;
   tempId: number;
 };
+
+export type InitialEncounter = Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>;

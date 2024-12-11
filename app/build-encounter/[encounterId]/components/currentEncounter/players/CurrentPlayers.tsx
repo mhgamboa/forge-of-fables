@@ -40,6 +40,7 @@ export default function CurrentPlayers() {
 
       return draft;
     });
+
     setEncounter(nextState);
   };
 
@@ -51,7 +52,9 @@ export default function CurrentPlayers() {
             <Input
               type="text"
               placeholder="Player Name"
-              value={encounter_playersToBeUpdated.find(p => p.id === p.id)?.name ?? p.name ?? ""}
+              value={
+                encounter_playersToBeUpdated.find(e_p => e_p.id === p.id)?.name ?? p.name ?? ""
+              }
               onChange={e => handleChange(e, p.id, i)}
             />
             <button>

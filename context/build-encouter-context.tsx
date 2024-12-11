@@ -1,16 +1,16 @@
-// /context/EncounterContext.tsx
 "use client";
 import { Dispatch, SetStateAction, createContext, useContext, useState, ReactNode } from "react";
 import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
 import { Tables } from "@/types/database.types";
 import {
+  InitialEncounter,
   EncounterMonstersType,
   encounterMonstersToBeAddedType,
   EncounterPlayersType,
   EncounterPlayersToBeAddedType,
 } from "@/types/buildEncounter";
 
-export type EncounterContextType = Awaited<ReturnType<typeof getSingleEncounterWithMonsters>> & {
+export type EncounterContextType = InitialEncounter & {
   newEncounterName: string;
   newEncounterDescription: string;
   encounter_monstersToBeAdded: encounterMonstersToBeAddedType[];
@@ -29,13 +29,12 @@ type EncounterContextValue = {
 
 export const EncounterContext = createContext<EncounterContextValue | null>(null);
 
-export const EncounterContextProvider = ({
-  children,
-  initialEncounter,
-}: {
+type Props = {
   children: ReactNode;
-  initialEncounter: Awaited<ReturnType<typeof getSingleEncounterWithMonsters>>;
-}) => {
+  initialEncounter: InitialEncounter;
+};
+
+export const EncounterContextProvider = ({ children, initialEncounter }: Props) => {
   const initializeEncounter = (): EncounterContextType => ({
     ...initialEncounter,
     newEncounterName: "",
