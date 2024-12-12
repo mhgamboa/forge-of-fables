@@ -2,6 +2,7 @@
 import { authenticateUser } from "@/data-access/auth";
 import { createClient } from "@/utils/supabase/server";
 import { encounterMonstersToBeAddedType, type EncounterMonstersType } from "@/types/buildEncounter";
+import { redirect } from "next/navigation";
 
 type MonsterArr = encounterMonstersToBeAddedType[];
 
@@ -43,4 +44,22 @@ export const deleteEncounter_monsters = async (arr: EncounterMonstersType[], use
     throw error;
   }
   return data;
+};
+
+export const getEncounter_monster = async (id: number) => {
+  const supabase = await createClient();
+  const { id: user_id } = await authenticateUser(supabase);
+
+  const { data: monster } = await supabase
+    .from("encounter_monsters")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", user_id)
+    .single();
+
+  if (!monster) {
+    return [redirect("/my-encounters")];
+  }
+
+  return monster;
 };

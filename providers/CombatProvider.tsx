@@ -1,41 +1,77 @@
-import { Tables } from "@/types/database.types";
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import { createStore, StoreApi, useStore } from "zustand";
-import { CombatMonster } from "@/types/combat";
 
-type CombatStore = {
-  combat: CombatMonster[];
-  updateCombat: (monsters: CombatMonster[]) => void;
-  index: number;
-  increment: () => void;
-  decrement: () => void;
-  setIndex: (index: number) => void;
+import { Tables } from "@/types/database.types";
+
+export type EncounterMonsterType = {
+  id: string;
+  notes: string | null;
+  info: Tables<"monsters">;
+  currentHp: number;
+  initiative: number;
+  isMonster: true;
 };
 
-const CombatContext = createContext<StoreApi<CombatStore> | undefined>(undefined);
-
-// type CombatProviderProps = PropsWithChildren & { initialCount: number };
-type CombatProviderProps = {
-  children?: React.ReactNode;
-  initialCombat: CombatMonster[];
+export type EncounterPlayerType = {
+  id: string;
+  name: string;
+  notes: string | null;
+  initiative: number;
+  isMonster: false;
+  currentHp: number;
 };
 
-export default function CombatProvider({ children, initialCombat }: CombatProviderProps) {
+type EncounterStore = {
+  id: number;
+  name: string;
+  description: string | null;
+  combatants: (EncounterMonsterType | EncounterPlayerType)[];
+  currentTurn: number;
+
+  // Methods to manage encounter
+  setCombatants: (combatants: (EncounterMonsterType | EncounterPlayerType)[]) => void;
+  setCurrentTurn: (currentTurn: number) => void;
+  // updateHp: (id: number, newHp: number) => void;
+};
+
+const EncounterContext = createContext<StoreApi<EncounterStore> | undefined>(undefined);
+
+type CombatProviderProps = PropsWithChildren & {
+  id: number;
+  name: string;
+  description: string | null;
+  children: React.ReactNode;
+  combatants: (EncounterMonsterType | EncounterPlayerType)[];
+};
+
+export default function CombatProvider({
+  id,
+  name,
+  description,
+  combatants,
+  children,
+}: CombatProviderProps) {
   const [store] = useState(() =>
-    createStore<CombatStore>(set => ({
-      combat: initialCombat,
-      updateCombat: (monsters: CombatMonster[]) => set({ combat: monsters }),
-      index: 0,
-      increment: () => set(state => ({ index: state.index + 1 })),
-      decrement: () => set(state => ({ index: state.index - 1 })),
-      setIndex: (index: number) => set({ index }),
+    createStore<EncounterStore>(set => ({
+      id,
+      name,
+      description,
+      combatants,
+      currentTurn: 0,
+      setCombatants: (newCombatants: (EncounterMonsterType | EncounterPlayerType)[]) =>
+        set({ combatants: newCombatants }),
+      setCurrentTurn: (newTurn: number) => set({ currentTurn: newTurn }),
+      // updateHp: (id: number, newHp: number) =>
+      //   set(state => ({
+      //     combatants: state.combatants.map(c => (c.id === id ? { ...c, currentHp: newHp } : c)),
+      //   })),
     }))
   );
-  return <CombatContext.Provider value={store}>{children}</CombatContext.Provider>;
+  return <EncounterContext.Provider value={store}>{children}</EncounterContext.Provider>;
 }
 
-export function useCombatStore<T>(selector: (state: CombatStore) => T) {
-  const context = useContext(CombatContext);
-  if (!context) throw new Error("CombatContext.Provider not found");
+export function useEncounterStore<T>(selector: (state: EncounterStore) => T) {
+  const context = useContext(EncounterContext);
+  if (!context) throw new Error("EncounterContext.Provider not found");
   return useStore(context, selector);
 }

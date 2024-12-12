@@ -1,6 +1,6 @@
 "use client";
 import { Dispatch, SetStateAction, createContext, useContext, useState, ReactNode } from "react";
-import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
+import { getEncounterWithRelations } from "@/data-access/encounters";
 import { Tables } from "@/types/database.types";
 import {
   InitialEncounter,

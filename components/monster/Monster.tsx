@@ -19,16 +19,19 @@ import { CombatMonster } from "@/types/combat";
 
 import { rollDice } from "@/utils/rollDice";
 import { cn } from "@/lib/utils";
+import { EncounterPlayerType, EncounterMonsterType } from "@/providers/CombatProvider";
 
+// TODO: Rename these props. Props come from @/app/run-encounter/[encounterId]/(components)/CurrentCombatant.tsx
 type Props = {
   monster: Tables<"monsters">;
-  combat: boolean;
-  updateCombat?: (combat: CombatMonster[]) => void;
-  currentCombat?: CombatMonster[];
+  combat: boolean; //Can just use currentCombat instead
+  updateCombat?: (c: (EncounterMonsterType | EncounterPlayerType)[]) => void;
+  currentCombat?: (EncounterPlayerType | EncounterMonsterType)[];
   index?: number;
   className?: string;
 };
 
+// TODO: Refactor into small more readable components. This is a mess. Probably just plop it all into claude.ai
 export default function Monster({
   monster,
   combat,
@@ -37,34 +40,20 @@ export default function Monster({
   index,
   className,
 }: Props) {
+  // prettier-ignore
   const {
-    ac_notes,
-    ac_value,
-    actions,
-    cha,
-    challenge,
-    con,
-    condition_immunities,
-    damage_immunities,
-    damage_resistances,
-    damage_vulnerabilities,
-    description,
-    dex,
-    hp_notes,
-    hp_value,
-    int,
-    languages,
     name,
-    saves,
-    senses,
-    skills,
-    source,
+    ac_notes, ac_value, hp_notes, hp_value,
     speed,
-    str,
-    tags,
+    str, dex, con, int, wis, cha,
+    damage_vulnerabilities, damage_immunities, damage_resistances, condition_immunities,
+    saves, skills, senses, languages, challenge,
     traits,
+    actions,
+    description,
+    source,
+    tags,
     type,
-    wis,
   } = monster;
 
   // Unless we can implement types supabase JSONB, this is necessary

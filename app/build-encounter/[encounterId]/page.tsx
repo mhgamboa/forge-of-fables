@@ -9,7 +9,7 @@ import CurrentEncounter from "./components/CurrentEncounter";
 import SearchBar from "./components/SearchBar";
 import { QueryContextProvider } from "./components/QueryContext";
 import { getXMonsters } from "@/data-access/monster";
-import { getSingleEncounterWithMonsters } from "@/data-access/encounters";
+import { getEncounterWithRelations } from "@/data-access/encounters";
 
 type Props = {
   params: Promise<{ encounterId: string }>;
@@ -26,10 +26,7 @@ export default async function BuildEncounters({ params, searchParams }: Props) {
   if (!numberRegex.test(encounterId) || id <= 0) redirect("/my-encounters");
 
   // Start fetching encounter and monsters simultaneously
-  const [encounter, monsters] = await Promise.all([
-    getSingleEncounterWithMonsters(id),
-    getXMonsters(),
-  ]);
+  const [encounter, monsters] = await Promise.all([getEncounterWithRelations(id), getXMonsters()]);
 
   if (!encounter) redirect("/my-encounters");
 

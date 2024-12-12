@@ -33,7 +33,7 @@ export const getEncounterMonsters = async (encounterId: number) => {
   return monsters;
 };
 
-export const getSingleEncounterWithMonsters = async (encounterId: number) => {
+export const getEncounterWithRelations = async (encounterId: number) => {
   const supabase = await createClient();
   const { id: user_id } = await authenticateUser(supabase);
 
@@ -49,6 +49,27 @@ export const getSingleEncounterWithMonsters = async (encounterId: number) => {
           monsters (name, id)
         ),
         encounter_players (id, name, notes)`
+    )
+    .eq("id", encounterId)
+    .eq("user_id", user_id)
+    .single();
+
+  if (!encounter) return redirect("/my-encounters");
+
+  return encounter;
+};
+
+export const getEncounterWithRelationsFull = async (encounterId: number) => {
+  const supabase = await createClient();
+  const { id: user_id } = await authenticateUser(supabase);
+
+  const { data: encounter } = await supabase
+    .from("encounters")
+    .select(
+      // Supabase doesn't make redundant queries to the monster table (According do Claude & GPT)
+      ` *,
+        encounter_monsters (*, monsters (*)),
+        encounter_players (*)`
     )
     .eq("id", encounterId)
     .eq("user_id", user_id)
