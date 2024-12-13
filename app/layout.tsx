@@ -7,7 +7,7 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -18,10 +18,10 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Forge of Fables",
-  description: "The best way to manage 5e combat",
+  description: "The easiest way to manage 5e combat",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
@@ -45,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </nav> */}
               <Navbar />
+              {/* TODO: Adjust this for run-encounter as the Navbar is nested in it */}
               <div className="flex flex-col p-5 container">
                 <NuqsAdapter>{children}</NuqsAdapter>
               </div>

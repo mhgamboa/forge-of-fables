@@ -3,54 +3,46 @@ import { redirect } from "next/navigation";
 import { Loader } from "lucide-react";
 
 import { EncounterContextProvider } from "@/context/build-encouter-context";
-import { EncounterSavedContextProvider } from "@/context/encounter-saved-context";
 
-import { getEncounterJsonName, getEncounterMonsters } from "@/data-access/encounter_json";
-
-import MonsterList from "./(components)/MonsterList";
-import CurrentEncounter from "./(components)/CurrentEncounter";
-import SearchBar from "./(components)/SearchBar";
-import { QueryContextProvider } from "./(components)/QueryContext";
+import MonsterList from "./components/MonsterList";
+import CurrentEncounter from "./components/CurrentEncounter";
+import SearchBar from "./components/SearchBar";
+import { QueryContextProvider } from "./components/QueryContext";
 import { getXMonsters } from "@/data-access/monster";
-
-type Params = Promise<{ encounterId: string }>;
-type SearchParams = Promise<{ query: string }>;
+import { getEncounterWithRelations } from "@/data-access/encounters";
 
 type Props = {
-  params: Params;
-  searchParams: SearchParams;
+  params: Promise<{ encounterId: string }>;
+  searchParams: Promise<{ query: string }>;
 };
 
-export default async function BuildEncounters(props: Props) {
-  const params = await props.params;
-  const searchParams = await props.searchParams;
-  const { encounterId } = params;
+export default async function BuildEncounters({ params, searchParams }: Props) {
+  const encounterId = (await params).encounterId;
+  const query = (await searchParams).query || "";
 
-  if (encounterId !== "new" && typeof parseInt(encounterId) !== "number")
-    redirect("/build-encounter/new");
-
-  const query = searchParams?.query || "";
   const id = parseInt(encounterId);
+  const numberRegex = /^\d+$/;
+  // If not valid number, redirect to new encounter
+  if (!numberRegex.test(encounterId) || id <= 0) redirect("/my-encounters");
 
-  const encounterName = id ? await getEncounterJsonName(id) : "";
-  const encounterJson = id ? await getEncounterMonsters(id) : [];
-  const monsters = await getXMonsters();
+  // Start fetching encounter and monsters simultaneously
+  const [encounter, monsters] = await Promise.all([getEncounterWithRelations(id), getXMonsters()]);
+
+  if (!encounter) redirect("/my-encounters");
 
   return (
-    <EncounterSavedContextProvider>
-      <EncounterContextProvider initialEncounterJson={encounterJson}>
-        <QueryContextProvider initialQuery={query}>
-          <SearchBar />
-          <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Suspense fallback={<FallBack />}>
-              {/* <MonsterList query={query} /> */}
-              <MonsterList monsters={monsters} />
-            </Suspense>
-            <CurrentEncounter id={id} name={encounterName} />
-          </div>
-        </QueryContextProvider>
-      </EncounterContextProvider>
-    </EncounterSavedContextProvider>
+    <EncounterContextProvider initialEncounter={encounter}>
+      <QueryContextProvider initialQuery={query}>
+        <SearchBar />
+        <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Suspense fallback={<FallBack />}>
+            {/* <MonsterList query={query} /> */}
+            <MonsterList monsters={monsters} />
+          </Suspense>
+          <CurrentEncounter />
+        </div>
+      </QueryContextProvider>
+    </EncounterContextProvider>
   );
 }
 

@@ -4,27 +4,32 @@ import { cn } from "@/lib/utils";
 
 import Monster from "@/components/monster/Monster";
 
-import { useCombatStore } from "@/providers/CombatProvider";
+import { EncounterMonsterType, useEncounterStore } from "@/providers/CombatProvider";
+import Player from "@/components/player/Player";
 
 type Props = {
   className?: string;
 };
 
 export default function CurrentCombatant({ className }: Props) {
-  const index = useCombatStore(state => state.index);
-  const combat = useCombatStore(state => state.combat);
-  const updateCombat = useCombatStore(state => state.updateCombat);
+  const currentTurn = useEncounterStore(state => state.currentTurn);
+  const combatants = useEncounterStore(state => state.combatants);
+  const updateCombat = useEncounterStore(state => state.setCombatants);
 
   return (
     <div className={cn("border-2 border-black rounded", className)}>
-      <Monster
-        monster={combat[index]}
-        index={index}
-        combat={true}
-        updateCombat={updateCombat}
-        currentCombat={combat}
-        className="h-full"
-      />
+      {combatants[currentTurn].isMonster ? (
+        <Monster
+          monster={(combatants[currentTurn] as EncounterMonsterType).info}
+          index={currentTurn}
+          combat={true}
+          updateCombat={updateCombat}
+          currentCombat={combatants}
+          className="h-full"
+        />
+      ) : (
+        <Player />
+      )}
     </div>
   );
 }

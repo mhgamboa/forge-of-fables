@@ -3,24 +3,26 @@ import React from "react";
 import { create } from "mutative";
 
 import { cn } from "@/lib/utils";
-import { useCombatStore } from "@/providers/CombatProvider";
+import { useEncounterStore } from "@/providers/CombatProvider";
 import { Input } from "@/components/ui/input";
+import InitiativeModal from "./initiative-modal/InitiativeModal";
 
 type Props = {
   className?: string;
 };
 
 export default function Combatants({ className }: Props) {
-  const combat = useCombatStore(state => state.combat);
-  const updateCombat = useCombatStore(state => state.updateCombat);
-  const setIndex = useCombatStore(state => state.setIndex);
+  const combatants = useEncounterStore(state => state.combatants);
+  const setCombatants = useEncounterStore(state => state.setCombatants);
+  const setCurrentTurn = useEncounterStore(state => state.setCurrentTurn);
+  const currentTurn = useEncounterStore(state => state.currentTurn);
 
   const handleHPChange = (e: React.ChangeEvent<HTMLInputElement>, i: number) => {
     e.preventDefault();
-    const newState = create(combat, draft => {
+    const newState = create(combatants, draft => {
       draft[i].currentHp = +e.target.value;
     });
-    updateCombat(newState);
+    setCombatants(newState);
   };
 
   return (
@@ -30,25 +32,30 @@ export default function Combatants({ className }: Props) {
         className
       )}
     >
-      {combat.map((monster, i) => (
-        <div
-          key={`${monster.id}-${i}`}
-          className="flex justify-between p-4 border-b last:border-b-0 cursor-pointer items-center"
-          onClick={() => setIndex(i)}
-        >
-          <div>{monster.name}</div>
-          <div className="flex items-center justify-end space-x-4 w-32">
-            <Input
-              type="number"
-              value={monster.currentHp}
-              onChange={e => handleHPChange(e, i)}
-              onClick={e => e.stopPropagation()}
-              className="w-20"
-            />
-            /{monster.hp_value}
+      {combatants.map((c, i) => {
+        return (
+          <div
+            key={c.id}
+            className={cn(
+              "flex justify-between p-4 border-b last:border-b-0 cursor-pointer items-center",
+              currentTurn === i && "bg-gray-200 dark:bg-gray-800"
+            )}
+            onClick={() => setCurrentTurn(i)}
+          >
+            <div>{c.isMonster ? c.info.name : c.name}</div>
+            <div className="flex items-center justify-end space-x-4 w-32">
+              <Input
+                type="number"
+                value={c.currentHp}
+                onChange={e => handleHPChange(e, i)}
+                onClick={e => e.stopPropagation()}
+                className="w-20"
+              />
+              {c.isMonster && <>/{c.info.hp_value}</>}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

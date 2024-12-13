@@ -43,6 +43,7 @@ export type Database = {
           id: number
           monster_id: number
           notes: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -50,6 +51,7 @@ export type Database = {
           id?: number
           monster_id: number
           notes?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -57,6 +59,7 @@ export type Database = {
           id?: number
           monster_id?: number
           notes?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -82,6 +85,7 @@ export type Database = {
           id: number
           name: string | null
           notes: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -89,6 +93,7 @@ export type Database = {
           id?: number
           name?: string | null
           notes?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -96,6 +101,7 @@ export type Database = {
           id?: number
           name?: string | null
           notes?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -155,6 +161,7 @@ export type Database = {
           is_deleted: boolean
           languages: string[]
           name: string
+          raw_text: string | null
           saves: Json[] | null
           senses: string[]
           skills: Json
@@ -187,6 +194,7 @@ export type Database = {
           is_deleted?: boolean
           languages: string[]
           name: string
+          raw_text?: string | null
           saves?: Json[] | null
           senses: string[]
           skills: Json
@@ -219,6 +227,7 @@ export type Database = {
           is_deleted?: boolean
           languages?: string[]
           name?: string
+          raw_text?: string | null
           saves?: Json[] | null
           senses?: string[]
           skills?: Json

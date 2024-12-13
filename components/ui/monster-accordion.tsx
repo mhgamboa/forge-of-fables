@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { create } from "mutative";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronDown, Plus } from "lucide-react";
 
@@ -8,7 +9,6 @@ import { useEncounterContext } from "@/context/build-encouter-context";
 
 import { cn } from "@/lib/utils";
 import { Tables } from "@/types/database.types";
-import { useEncounterSavedContext } from "@/context/encounter-saved-context";
 const Accordion = AccordionPrimitive.Root;
 
 const AccordionItem = React.forwardRef<
@@ -19,7 +19,6 @@ const AccordionItem = React.forwardRef<
 ));
 AccordionItem.displayName = "AccordionItem";
 
-type Dog = { namez: string; id: number };
 type Props = React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & {
   className?: string;
   children: React.ReactNode;
@@ -50,26 +49,19 @@ const AccordionTrigger = React.forwardRef<
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const EncounterInteract = ({ monster }: { monster: Tables<"monsters"> }) => {
-  const { encounterJson, setEncounterJson } = useEncounterContext();
-  const { encounterSaved, setEncounterSaved } = useEncounterSavedContext();
+  const { encounter, setEncounter } = useEncounterContext();
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
-    const id = monster.id;
+    const { id, name } = monster;
 
-    const hasId = encounterJson.find(m => m.id === id);
-    if (hasId) {
-      // if hasId then add 1 to quantity without modifying original encounterJson
-      const index = encounterJson.findIndex(m => m.id === id);
-      setEncounterJson([
-        ...encounterJson.slice(0, index),
-        { ...encounterJson[index], quantity: encounterJson[index].quantity + 1 },
-        ...encounterJson.slice(index + 1),
-      ]);
-    } else {
-      setEncounterJson([...encounterJson, { id, name: monster.name, quantity: 1 }]);
-    }
-    setEncounterSaved(false);
+    const tempId = Math.floor(Math.random() * 1000000);
+    const nextState = create(encounter, draft => {
+      draft.encounter_monstersToBeAdded.push({ id, name, tempId });
+      draft.encounterSaved = false;
+    });
+    setEncounter(nextState);
   };
+
   return (
     <div onClick={handleClick} className="hover:bg-foreground/10 rounded-md p-2">
       <Plus className="h-4 w-4" />

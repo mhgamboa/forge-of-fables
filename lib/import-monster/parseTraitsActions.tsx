@@ -57,7 +57,8 @@ export default function parseTraitActions(arr: string[]) {
     const handleTrait = () => {
       if (currentTitle === "traits") {
         // If name is not empty, push to traits array
-        currentName !== "" && traits.push({ name: currentName, description: currentDescription });
+        currentName !== "" &&
+          traits.push({ name: currentName, description: currentDescription });
       } else {
         pushToContent();
       }
@@ -67,7 +68,6 @@ export default function parseTraitActions(arr: string[]) {
       const regex = /[.:]/;
       const index = s.search(regex);
       const value = [s.substring(0, index), s.substring(index + 2)]; // Find first occurance of "." or ":"
-      console.log("nameMatch ", nameMatch[0], "currentName: ", currentName);
 
       handleTrait();
       currentName = value[0];

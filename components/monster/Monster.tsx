@@ -19,16 +19,19 @@ import { CombatMonster } from "@/types/combat";
 
 import { rollDice } from "@/utils/rollDice";
 import { cn } from "@/lib/utils";
+import { EncounterPlayerType, EncounterMonsterType } from "@/providers/CombatProvider";
 
+// TODO: Rename these props. Props come from @/app/run-encounter/[encounterId]/(components)/CurrentCombatant.tsx
 type Props = {
   monster: Tables<"monsters">;
-  combat: boolean;
-  updateCombat?: (combat: CombatMonster[]) => void;
-  currentCombat?: CombatMonster[];
+  combat: boolean; //Can just use currentCombat instead
+  updateCombat?: (c: (EncounterMonsterType | EncounterPlayerType)[]) => void;
+  currentCombat?: (EncounterPlayerType | EncounterMonsterType)[];
   index?: number;
   className?: string;
 };
 
+// TODO: Refactor into small more readable components. This is a mess. Probably just plop it all into claude.ai
 export default function Monster({
   monster,
   combat,
@@ -37,34 +40,20 @@ export default function Monster({
   index,
   className,
 }: Props) {
+  // prettier-ignore
   const {
-    ac_notes,
-    ac_value,
-    actions,
-    cha,
-    challenge,
-    con,
-    condition_immunities,
-    damage_immunities,
-    damage_resistances,
-    damage_vulnerabilities,
-    description,
-    dex,
-    hp_notes,
-    hp_value,
-    int,
-    languages,
     name,
-    saves,
-    senses,
-    skills,
-    source,
+    ac_notes, ac_value, hp_notes, hp_value,
     speed,
-    str,
-    tags,
+    str, dex, con, int, wis, cha,
+    damage_vulnerabilities, damage_immunities, damage_resistances, condition_immunities,
+    saves, skills, senses, languages, challenge,
     traits,
+    actions,
+    description,
+    source,
+    tags,
     type,
-    wis,
   } = monster;
 
   // Unless we can implement types supabase JSONB, this is necessary
@@ -158,7 +147,7 @@ export default function Monster({
       <Separator className="my-2" />
 
       {/* traits */}
-      <div className="space-y-1 whitespace-pre-wrap py-2">
+      <div className="space-y-2 whitespace-pre-wrap py-2">
         {typedTraits &&
           typedTraits.map(t => {
             const toastDice = (input: string) => {
@@ -182,16 +171,18 @@ export default function Monster({
             const newDescription = reactStringReplace(
               t.description,
               /((?<=\s|\.)\+\d+(?=\s|\.))/gm, //+/- 4
-              match => <RollModifier key={match} modifier={parseInt(match.replace(/\s/g, ""))} />
+              (match, i) => (
+                <RollModifier key={`${match}-${i}`} modifier={parseInt(match.replace(/\s/g, ""))} />
+              )
             );
             const parseDamage = reactStringReplace(
               newDescription,
               /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
-              match => (
+              (match, i) => (
                 <button
                   className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
                   onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
-                  key={match}
+                  key={`${match}-${i}`}
                 >
                   {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
                   {match.replace(/\s/g, "").slice(1, -1)}
@@ -317,17 +308,17 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
           <div id="actions" className="py-2" key={a.title}>
             <h3 className="text-2xl font-light text-red-900">{a.title}</h3>
             <hr className="border-black" />
-            <div className="pt-4">
+            <div className="pt-4 space-y-3">
               {a.content.map((d, i) => {
                 if (!d) return;
                 const newDescription = reactStringReplace(
                   d.description,
                   /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
-                  match => (
+                  (match, i) => (
                     <button
                       className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
                       onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
-                      key={match}
+                      key={`${match}-${i}`}
                     >
                       {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
                       {match.replace(/\s/g, "").slice(1, -1)}
@@ -338,10 +329,10 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                   newDescription,
                   /((?<=\s|\.)\+\d+(?=\s|\.))/gm,
                   (match, index) => (
-                    <RollModifier modifier={parseInt(match)} />
+                    <RollModifier modifier={parseInt(match)} key={`${match}-${i}`} />
                     // <button
                     //   className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-                    //   key={match}
+                    //   key={`${match}-${i}`}
                     //   onClick={() => toastHit(match)}
                     // >
                     //   {match}
@@ -350,7 +341,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                 );
 
                 return (
-                  <Fragment key={`${d.name}-${index}-${i}`}>
+                  <div key={`${d.name}-${index}-${i}`}>
                     {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                     {/* {d.description} */}
                     {/* {newDescription} */}
@@ -376,7 +367,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                           return null; // Return nothing if no match
                         })()} */}
                     <br />
-                  </Fragment>
+                  </div>
                 );
               })}
             </div>

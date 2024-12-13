@@ -1,32 +1,68 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from "react";
-import { type FormattedEncounterJson } from "@/types/encounterJsonTypes";
+import { Dispatch, SetStateAction, createContext, useContext, useState, ReactNode } from "react";
+import { getEncounterWithRelations } from "@/data-access/encounters";
+import { Tables } from "@/types/database.types";
+import {
+  InitialEncounter,
+  EncounterMonstersType,
+  encounterMonstersToBeAddedType,
+  EncounterPlayersType,
+  EncounterPlayersToBeAddedType,
+} from "@/types/buildEncounter";
 
-type encounterContextValue = {
-  encounterJson: FormattedEncounterJson[];
-  setEncounterJson: React.Dispatch<React.SetStateAction<FormattedEncounterJson[]>>;
+// TODO: Convert to Zustand to reduce re-renders
+export type EncounterContextType = InitialEncounter & {
+  newEncounterName: string;
+  newEncounterDescription: string;
+  encounter_monstersToBeAdded: encounterMonstersToBeAddedType[];
+  encounter_monstersToBeRemoved: EncounterMonstersType[];
+  encounter_monstersToBeUpdated: Tables<"encounter_monsters">[];
+  encounter_playersToBeAdded: EncounterPlayersToBeAddedType[];
+  encounter_playersToBeRemoved: EncounterPlayersType[];
+  encounter_playersToBeUpdated: EncounterPlayersType[];
+  encounterSaved: boolean;
 };
-export const EncounterContext = createContext<encounterContextValue | null>(null);
 
-export const EncounterContextProvider = ({
-  children,
-  initialEncounterJson,
-}: {
+type EncounterContextValue = {
+  encounter: EncounterContextType;
+  setEncounter: Dispatch<SetStateAction<EncounterContextType>>;
+};
+
+export const EncounterContext = createContext<EncounterContextValue | null>(null);
+
+type Props = {
   children: ReactNode;
-  initialEncounterJson: FormattedEncounterJson[];
-}) => {
-  const [encounterJson, setEncounterJson] =
-    useState<FormattedEncounterJson[]>(initialEncounterJson);
+  initialEncounter: InitialEncounter;
+};
+
+export const EncounterContextProvider = ({ children, initialEncounter }: Props) => {
+  const initializeEncounter = (): EncounterContextType => ({
+    ...initialEncounter,
+    newEncounterName: "",
+    newEncounterDescription: "",
+    encounter_monstersToBeAdded: [],
+    encounter_monstersToBeRemoved: [],
+    encounter_monstersToBeUpdated: [],
+    encounter_playersToBeAdded: [],
+    encounter_playersToBeRemoved: [],
+    encounter_playersToBeUpdated: [],
+    encounterSaved: true,
+  });
+
+  const [encounter, setEncounter] = useState<EncounterContextType>(initializeEncounter);
+
   return (
-    <EncounterContext.Provider value={{ encounterJson, setEncounterJson }}>
+    <EncounterContext.Provider value={{ encounter, setEncounter }}>
       {children}
     </EncounterContext.Provider>
   );
 };
 
 export const useEncounterContext = () => {
-  ("useEncounterContext");
-  const encounter = useContext(EncounterContext);
-  if (encounter === null) throw new Error("no encounter context");
-  return encounter;
+  const context = useContext(EncounterContext);
+  if (!context)
+    throw new Error(
+      "EncounterContext is not provided. Wrap your component in <EncounterContextProvider>."
+    );
+  return context;
 };
