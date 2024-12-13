@@ -171,16 +171,18 @@ export default function Monster({
             const newDescription = reactStringReplace(
               t.description,
               /((?<=\s|\.)\+\d+(?=\s|\.))/gm, //+/- 4
-              match => <RollModifier key={match} modifier={parseInt(match.replace(/\s/g, ""))} />
+              (match, i) => (
+                <RollModifier key={`${match}-${i}`} modifier={parseInt(match.replace(/\s/g, ""))} />
+              )
             );
             const parseDamage = reactStringReplace(
               newDescription,
               /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
-              match => (
+              (match, i) => (
                 <button
                   className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
                   onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
-                  key={match}
+                  key={`${match}-${i}`}
                 >
                   {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
                   {match.replace(/\s/g, "").slice(1, -1)}
@@ -312,11 +314,11 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                 const newDescription = reactStringReplace(
                   d.description,
                   /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
-                  match => (
+                  (match, i) => (
                     <button
                       className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
                       onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
-                      key={match}
+                      key={`${match}-${i}`}
                     >
                       {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
                       {match.replace(/\s/g, "").slice(1, -1)}
@@ -327,10 +329,10 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                   newDescription,
                   /((?<=\s|\.)\+\d+(?=\s|\.))/gm,
                   (match, index) => (
-                    <RollModifier modifier={parseInt(match)} key={match} />
+                    <RollModifier modifier={parseInt(match)} key={`${match}-${i}`} />
                     // <button
                     //   className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-                    //   key={match}
+                    //   key={`${match}-${i}`}
                     //   onClick={() => toastHit(match)}
                     // >
                     //   {match}
