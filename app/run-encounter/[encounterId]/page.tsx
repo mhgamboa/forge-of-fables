@@ -6,6 +6,8 @@ import { getEncounterWithRelationsFull } from "@/data-access/encounters";
 import InitializeZustand from "./(components)/InitializeZustand";
 import Combatants from "./(components)/Combatants";
 import CurrentCombatant from "./(components)/CurrentCombatant";
+import InitiativeModal from "./(components)/initiative-modal/InitiativeModal";
+import EncounterNavbar from "./(components)/EncounterNavbar";
 
 type Props = {
   params: Promise<{ encounterId: number }>;
@@ -18,6 +20,7 @@ export default async function RunEncounterPage(props: Props) {
 
   return (
     <InitializeZustand encounter={encounter}>
+      <EncounterNavbar />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Combatants className="lg:col-span-1 bg-gray-50" />
         <CurrentCombatant className="lg:col-span-2" />

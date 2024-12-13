@@ -3,6 +3,8 @@ import { createStore, StoreApi, useStore } from "zustand";
 
 import { Tables } from "@/types/database.types";
 
+export type View = "none" | "initiative";
+
 export type EncounterMonsterType = {
   id: string;
   notes: string | null;
@@ -27,10 +29,12 @@ type EncounterStore = {
   description: string | null;
   combatants: (EncounterMonsterType | EncounterPlayerType)[];
   currentTurn: number;
+  view: View;
 
   // Methods to manage encounter
   setCombatants: (combatants: (EncounterMonsterType | EncounterPlayerType)[]) => void;
   setCurrentTurn: (currentTurn: number) => void;
+  setView: (view: View) => void;
   // updateHp: (id: number, newHp: number) => void;
 };
 
@@ -58,9 +62,11 @@ export default function CombatProvider({
       description,
       combatants,
       currentTurn: 0,
+      view: "none",
       setCombatants: (newCombatants: (EncounterMonsterType | EncounterPlayerType)[]) =>
         set({ combatants: newCombatants }),
       setCurrentTurn: (newTurn: number) => set({ currentTurn: newTurn }),
+      setView: (newView: View) => set({ view: newView }),
       // updateHp: (id: number, newHp: number) =>
       //   set(state => ({
       //     combatants: state.combatants.map(c => (c.id === id ? { ...c, currentHp: newHp } : c)),

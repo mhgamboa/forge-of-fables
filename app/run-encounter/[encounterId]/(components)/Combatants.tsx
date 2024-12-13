@@ -5,6 +5,7 @@ import { create } from "mutative";
 import { cn } from "@/lib/utils";
 import { useEncounterStore } from "@/providers/CombatProvider";
 import { Input } from "@/components/ui/input";
+import InitiativeModal from "./initiative-modal/InitiativeModal";
 
 type Props = {
   className?: string;
