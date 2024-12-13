@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { Menu, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { navLinks, encounterLinks } from "./Navbar";
+import { navLinks } from "./Navbar";
 
 export default function MobileView() {
   return (

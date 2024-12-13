@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 import Monster from "@/components/monster/Monster";
 
-import { useEncounterStore } from "@/providers/CombatProvider";
+import { EncounterMonsterType, useEncounterStore } from "@/providers/CombatProvider";
 import Player from "@/components/player/Player";
 
 type Props = {
@@ -20,7 +20,7 @@ export default function CurrentCombatant({ className }: Props) {
     <div className={cn("border-2 border-black rounded", className)}>
       {combatants[currentTurn].isMonster ? (
         <Monster
-          monster={combatants[currentTurn].info}
+          monster={(combatants[currentTurn] as EncounterMonsterType).info}
           index={currentTurn}
           combat={true}
           updateCombat={updateCombat}

@@ -16,25 +16,6 @@ export const navLinks = [
   { name: "Import Monster", href: "/import-monster", prefetch: true },
 ];
 
-export const encounterLinks = [
-  {
-    name: "RollDice",
-    action: () =>
-      toast("Coming Soon", {
-        position: "top-center",
-        closeButton: true,
-        action: { label: "Close", onClick: () => {} },
-      }),
-  },
-  {
-    name: "Set Initiative",
-    action: () => {
-      console.log("Set Initiative");
-    },
-    button: <InitiativeModal />,
-  },
-];
-
 export default function Component() {
   const pathname = usePathname();
   const runEncounter = pathname.startsWith("/run-encounter");
