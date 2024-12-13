@@ -147,7 +147,7 @@ export default function Monster({
       <Separator className="my-2" />
 
       {/* traits */}
-      <div className="space-y-1 whitespace-pre-wrap py-2">
+      <div className="space-y-2 whitespace-pre-wrap py-2">
         {typedTraits &&
           typedTraits.map(t => {
             const toastDice = (input: string) => {
@@ -306,7 +306,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
           <div id="actions" className="py-2" key={a.title}>
             <h3 className="text-2xl font-light text-red-900">{a.title}</h3>
             <hr className="border-black" />
-            <div className="pt-4">
+            <div className="pt-4 space-y-3">
               {a.content.map((d, i) => {
                 if (!d) return;
                 const newDescription = reactStringReplace(
@@ -339,7 +339,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                 );
 
                 return (
-                  <React.Fragment key={`${d.name}-${index}-${i}`}>
+                  <div key={`${d.name}-${index}-${i}`}>
                     {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
                     {/* {d.description} */}
                     {/* {newDescription} */}
@@ -365,7 +365,7 @@ const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boole
                           return null; // Return nothing if no match
                         })()} */}
                     <br />
-                  </React.Fragment>
+                  </div>
                 );
               })}
             </div>
