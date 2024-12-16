@@ -85,6 +85,7 @@ const parse = (input: string) => {
     actions,
     description: "",
     tags: [] as string[],
+    raw_text: input,
   } as Tables<"monsters">;
 };
 
