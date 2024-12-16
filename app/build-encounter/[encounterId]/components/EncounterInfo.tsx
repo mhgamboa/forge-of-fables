@@ -5,8 +5,9 @@ import { useEncounterContext } from "@/context/build-encouter-context";
 import { EncounterMonstersType, encounterMonstersToBeAddedType } from "@/types/buildEncounter";
 import { Undo, X } from "lucide-react";
 import PlayersList from "./PlayersList";
+import { cn } from "@/lib/utils";
 
-export default function EncounterInfo() {
+export default function EncounterInfo({ className }: { className?: string }) {
   const { encounter, setEncounter } = useEncounterContext();
 
   const removeMonster = (
@@ -61,7 +62,7 @@ export default function EncounterInfo() {
 
   // TODO: This page may be redundant? Consider consolidating children into CurrentEncounter
   return (
-    <div className="flex flex-col items-center">
+    <div className={cn("flex flex-col items-center", className)}>
       <div className="flex flex-col gap-y-2 w-full">
         <h2 className="text-center text-md lg:text-2xl font-bold text-gray-800 pb-2 dark:text-gray-200">
           Monsters

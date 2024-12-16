@@ -53,26 +53,30 @@ export default function CurrentEncounter() {
     <>
       {/* Desktop View */}
       <div className="hidden lg:block lg:col-span-1">
-        <div className="flex flex-col gap-4 p-4 border-2 border-foreground/10 rounded-md">
-          <Input
-            type="text"
-            placeholder="Encounter Name"
-            className="w-full"
-            defaultValue={encounter.name ?? encounter.newEncounterName ?? ""}
-            onChange={handleChange}
-          />
+        <div className="sticky top-10 z-10 max-h-[90svh]">
+          {" "}
+          {/* Added z-index and adjusted top positioning */}
+          <div className="flex flex-col gap-4 p-4 border-2 border-foreground/10 rounded-md">
+            <Input
+              type="text"
+              placeholder="Encounter Name"
+              className="w-full"
+              defaultValue={encounter.name ?? encounter.newEncounterName ?? ""}
+              onChange={handleChange}
+            />
 
-          <EncounterInfo />
-          <Button
-            onClick={handleSave}
-            disabled={encounter.encounterSaved}
-            className={cn("w-full relative", encounter.encounterSaved && "cursor-not-allowed")}
-          >
-            {!encounter.encounterSaved && (
-              <span className="top-[-0.25rem] right-[-0.25rem] absolute w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
-            )}
-            Save changes
-          </Button>
+            <EncounterInfo className="overflow-y-scroll max-h-[60svh]" />
+            <Button
+              onClick={handleSave}
+              disabled={encounter.encounterSaved}
+              className={cn("w-full relative", encounter.encounterSaved && "cursor-not-allowed")}
+            >
+              {!encounter.encounterSaved && (
+                <span className="top-[-0.25rem] right-[-0.25rem] absolute w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
+              )}
+              Save changes
+            </Button>
+          </div>
         </div>
       </div>
       {/* Mobile View */}

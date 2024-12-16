@@ -11,7 +11,7 @@ type Props = {
 
 export default function Body({ newCombatants, setNewCombatants }: Props) {
   return (
-    <div className="flex flex-col divide-y divide-slate-200 bg-slate-100 dark:bg-slate-700 p-4">
+    <div className="flex flex-col divide-y divide-slate-200 bg-slate-100 dark:bg-slate-700 p-4 overflow-y-scroll max-h-96">
       {newCombatants.map((c, i) => {
         return (
           <div key={c.id} className="flex justify-between items-center gap-4">
