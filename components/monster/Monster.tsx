@@ -1,37 +1,72 @@
 "use client";
-import React, { Fragment } from "react";
-import reactStringReplace from "react-string-replace";
+
+import React from "react";
 import { toast } from "sonner";
 import { create } from "mutative";
 
-import calculateModifier from "@/utils/calculateAbilityScore";
+// Utility Imports
 import calculateXP from "@/utils/calculateXP";
-
-import { Input } from "@/components/ui/input";
-import { Toggle } from "@/components/ui/toggle";
-import { Separator } from "@/components/ui/separator";
-
-import { Check } from "lucide-react";
-
-import { Tables } from "@/types/database.types";
-import { Saves, Skills, Traits, Actions } from "@/types/monster";
-import { CombatMonster } from "@/types/combat";
-
 import { rollDice } from "@/utils/rollDice";
 import { cn } from "@/lib/utils";
-import { EncounterPlayerType, EncounterMonsterType } from "@/providers/CombatProvider";
 
-// TODO: Rename these props. Props come from @/app/run-encounter/[encounterId]/(components)/CurrentCombatant.tsx
-type Props = {
+// Component Imports
+import { Separator } from "@/components/ui/separator";
+
+// Type Imports
+import { Tables } from "@/types/database.types";
+import { Saves, Skills, Traits, Actions } from "@/types/monster";
+import { EncounterPlayerType, EncounterMonsterType } from "@/providers/CombatProvider";
+import ActionsDisplay from "./ActionsDisplay";
+import AbilityScore from "./AbilityScore";
+import TraitsDisplay from "./TraitsDisplay";
+import ListDisplay from "./ListDisplay";
+import SavesDisplay from "./SavesDisplay";
+import MonsterStats from "./MonsterStats";
+
+// Props Type
+interface MonsterProps {
   monster: Tables<"monsters">;
-  combat: boolean; //Can just use currentCombat instead
+  combat: boolean;
   updateCombat?: (c: (EncounterMonsterType | EncounterPlayerType)[]) => void;
   currentCombat?: (EncounterPlayerType | EncounterMonsterType)[];
   index?: number;
   className?: string;
+}
+
+// Utility Functions
+export const toastDiceRoll = (input: string, type: "damage" | "modifier" = "damage") => {
+  const numDiceMatch = input.match(/^\d+/);
+  const diceSidesMatch = input.match(/(?<=d)\d+/);
+  const modifierMatch = input.match(/(?<!d|\d)\d+$/);
+
+  const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
+  const diceSides = diceSidesMatch ? Number(diceSidesMatch[0]) : null;
+  const modifier = modifierMatch ? Number(modifierMatch[0]) : null;
+
+  if (type === "damage") {
+    if (!diceSides) return toast("Invalid dice", { position: "top-center" });
+    if (!numDice) return toast("Invalid dice count", { position: "top-center" });
+
+    let result: number = 0;
+    for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
+    if (modifier) result += modifier;
+
+    toast(`You rolled ${result}`, { position: "top-center" });
+  } else {
+    const number = parseInt(input);
+    if (isNaN(number)) return toast("Invalid modifier", { position: "top-center" });
+
+    const result = rollDice(20);
+    const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
+
+    toast(`You rolled ${result + number}`, {
+      position: "top-center",
+      description,
+    });
+  }
 };
 
-// TODO: Refactor into small more readable components. This is a mess. Probably just plop it all into claude.ai
+// Main Monster Component
 export default function Monster({
   monster,
   combat,
@@ -39,33 +74,33 @@ export default function Monster({
   currentCombat,
   index,
   className,
-}: Props) {
+}: MonsterProps) {
   // prettier-ignore
   const {
-    name,
-    ac_notes, ac_value, hp_notes, hp_value,
-    speed,
-    str, dex, con, int, wis, cha,
-    damage_vulnerabilities, damage_immunities, damage_resistances, condition_immunities,
-    saves, skills, senses, languages, challenge,
-    traits,
-    actions,
-    description,
-    source,
-    tags,
-    type,
-  } = monster;
+      name,
+      ac_notes, ac_value, hp_notes, hp_value,
+      speed,
+      str, dex, con, int, wis, cha,
+      damage_vulnerabilities, damage_immunities, damage_resistances, condition_immunities,
+      saves, skills, senses, languages, challenge,
+      traits,
+      actions,
+      description,
+      source,
+      tags,
+      type,
+    } = monster;
 
-  // Unless we can implement types supabase JSONB, this is necessary
+  // Type casting for Supabase JSONB
   const typedSaves = saves as Saves;
   const typedSkills = skills as Skills;
   const typedTraits = traits as Traits;
   const typedActions = actions as Actions;
 
+  // HP Change Handler
   const handleHPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!currentCombat) return;
-    if (!updateCombat) return;
-    if (index === undefined) return;
+    if (!currentCombat || !updateCombat || index === undefined) return;
+
     const newState = create(currentCombat, draft => {
       draft[index].currentHp = +e.target.value;
     });
@@ -76,68 +111,53 @@ export default function Monster({
     <div
       className={cn("lg:columns-2 lg:gap-4 bg-gray-100 dark:bg-gray-900 p-3 rounded-sm", className)}
     >
+      {/* Name */}
       <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
       <Separator className="my-2" />
-      {/* ac, hp, speed */}
-      <div className="py-2 text-red-900">
-        <div>
-          {" "}
-          <span className="font-bold">Armor Class</span> {ac_value} {ac_notes}{" "}
-        </div>
-        <div className="flex items-center space-x-1">
-          <span className="font-bold">Hit Points</span>{" "}
-          {updateCombat && (
-            <>
-              <Input
-                type="number"
-                className="w-20"
-                value={currentCombat && index != null ? currentCombat[index].currentHp : ""}
-                onChange={e => handleHPChange(e)}
-              />
-            </>
-          )}{" "}
-          {hp_value} {hp_notes}
-        </div>
-        <div id="speed">
-          <span className="font-bold">Speed</span> {speed.join(", ")}
-        </div>
-      </div>
+
+      {/* AC, HP, Speed */}
+      <MonsterStats
+        ac_value={ac_value}
+        ac_notes={ac_notes}
+        hp_value={hp_value}
+        hp_notes={hp_notes}
+        speed={speed}
+        updateCombat={updateCombat}
+        currentCombat={currentCombat}
+        index={index}
+      />
       <Separator className="my-2" />
 
       {/* Ability Scores */}
       <div className="flex w-full py-2 text-red-900">
-        <Ability name="str" modifier={str} combat={combat} />
-        <Ability name="dex" modifier={dex} combat={combat} />
-        <Ability name="con" modifier={con} combat={combat} />
-        <Ability name="int" modifier={int} combat={combat} />
-        <Ability name="wis" modifier={wis} combat={combat} />
-        <Ability name="cha" modifier={cha} combat={combat} />
+        <AbilityScore name="str" modifier={str} combat={combat} />
+        <AbilityScore name="dex" modifier={dex} combat={combat} />
+        <AbilityScore name="con" modifier={con} combat={combat} />
+        <AbilityScore name="int" modifier={int} combat={combat} />
+        <AbilityScore name="wis" modifier={wis} combat={combat} />
+        <AbilityScore name="cha" modifier={cha} combat={combat} />
       </div>
       <Separator className="my-2" />
 
-      {/* Vulnerabilities/Resistances/Immunities, saves, skills, senses, languages, CR */}
+      {/* Vulnerabilities, Resistances, Immunities, Saves, Skills, etc. */}
       <div className="flex w-full flex-col py-2 gap-y-2 text-red-900">
-        {damage_vulnerabilities.length >= 1 && (
-          <List list={damage_vulnerabilities} title="Damage Vulnerabilities" />
-        )}
-        {damage_resistances.length >= 1 && (
-          <List list={damage_resistances} title="Damage Resistances" />
-        )}
-        {damage_immunities.length >= 1 && (
-          <List list={damage_immunities} title="Damage Immunities" />
-        )}
-        {condition_immunities.length >= 1 && (
-          <List list={condition_immunities} title="Condition Immunities" />
-        )}
-        <SavesComponent saves={typedSaves} />
+        <ListDisplay list={damage_vulnerabilities} title="Damage Vulnerabilities" />
+        <ListDisplay list={damage_resistances} title="Damage Resistances" />
+        <ListDisplay list={damage_immunities} title="Damage Immunities" />
+        <ListDisplay list={condition_immunities} title="Condition Immunities" />
+
+        <SavesDisplay saves={typedSaves} />
+
         {typedSkills.length >= 1 && (
           <div>
             <span className="font-bold">Skills</span>{" "}
             {typedSkills.map(s => `${s.name} +${s.modifier}`).join(", ")}
           </div>
         )}
-        <List list={senses} title="Senses" />
-        <List list={languages} title="Languages" />
+
+        <ListDisplay list={senses} title="Senses" />
+        <ListDisplay list={languages} title="Languages" />
+
         {challenge && (
           <div>
             <span className="font-bold">Challenge</span> {challenge} ({calculateXP(challenge)} XP)
@@ -146,290 +166,8 @@ export default function Monster({
       </div>
       <Separator className="my-2" />
 
-      {/* traits */}
-      <div className="space-y-2 whitespace-pre-wrap py-2">
-        {typedTraits &&
-          typedTraits.map(t => {
-            const toastDice = (input: string) => {
-              const numDiceMatch = input.match(/^\d+/);
-              const diceSideesMatch = input.match(/(?<=d)\d+/);
-              const modifierMatch = input.match(/(?<!d|\d)\d+$/);
-
-              const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
-              const diceSides = diceSideesMatch ? Number(diceSideesMatch[0]) : null;
-              const modifier = modifierMatch ? Number(modifierMatch[0]) : null;
-
-              if (!diceSides) return toast("Invalid number", { position: "top-center" });
-              if (!numDice) return toast("Invalid number", { position: "top-center" });
-
-              let result: number = 0;
-              for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
-              if (modifier) result += modifier;
-
-              toast(`You rolled ${result}`, { position: "top-center" });
-            };
-            const newDescription = reactStringReplace(
-              t.description,
-              /((?<=\s|\.)\+\d+(?=\s|\.))/gm, //+/- 4
-              (match, i) => (
-                <RollModifier key={`${match}-${i}`} modifier={parseInt(match.replace(/\s/g, ""))} />
-              )
-            );
-            const parseDamage = reactStringReplace(
-              newDescription,
-              /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
-              (match, i) => (
-                <button
-                  className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-                  onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
-                  key={`${match}-${i}`}
-                >
-                  {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
-                  {match.replace(/\s/g, "").slice(1, -1)}
-                </button>
-              )
-            );
-            return (
-              <div key={t.name}>
-                <span className="font-semibold italic">{t.name}. </span>
-                {/* {t.description} */}
-                {/* {newDescription} */}
-                {parseDamage}
-              </div>
-            );
-          })}
-      </div>
-      {/* actions */}
-      <ActionsComponent actions={typedActions} combat={combat} />
+      <TraitsDisplay traits={typedTraits} />
+      <ActionsDisplay actions={typedActions} />
     </div>
   );
 }
-
-const Ability = ({
-  name,
-  modifier,
-  combat,
-}: {
-  name: string;
-  modifier: number;
-  combat: boolean;
-}) => {
-  const abilityModifier = calculateModifier(modifier);
-  const toastDice = (input: string) => {
-    const number = parseInt(input);
-    if (isNaN(number)) return toast("Invalid number", { position: "top-center" });
-    // if (number < 1 || number > 20) return toast("Invalid number", { position: "top-center" });
-    const result = rollDice(20);
-
-    // Iff number is negative, we don't need the + symbol in the description
-    const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
-
-    toast(`You rolled ${result + number}`, {
-      position: "top-center",
-      description,
-    });
-  };
-
-  return (
-    <div className="flex w-1/6 flex-col items-center">
-      <div className="font-bold">{name}</div>
-      <div>
-        {combat ? (
-          <button
-            className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-            onClick={() => toastDice(abilityModifier.toString())}
-          >
-            {abilityModifier > 0 ? `+${abilityModifier}` : abilityModifier}
-          </button>
-        ) : (
-          <p className="w-full text-center">
-            {modifier} ({abilityModifier > 0 ? `+${abilityModifier}` : abilityModifier})
-          </p>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const List = ({ list, title }: { list: string[]; title: string }) => {
-  return (
-    <div id={title}>
-      {list.length >= 1 && (
-        <>
-          <span className="font-bold">{title}</span> {list.join(", ")}
-        </>
-      )}
-    </div>
-  );
-};
-
-const SavesComponent = ({ saves }: { saves: Saves }) => {
-  return (
-    <>
-      {saves && saves.length > 1 && (
-        <div>
-          <span className="font-bold">Saves</span>{" "}
-          {saves
-            .map(s => {
-              if (!s) return;
-              return `${s.name} +${s!.modifier}`;
-            })
-            .join(", ")}
-        </div>
-      )}
-    </>
-  );
-};
-
-const ActionsComponent = ({ actions, combat }: { actions: Actions; combat: boolean }) => {
-  const toastDice = (input: string) => {
-    const numDiceMatch = input.match(/^\d+/);
-    const diceSideesMatch = input.match(/(?<=d)\d+/);
-    const modifierMatch = input.match(/(?<!d|\d)\d+$/);
-
-    const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
-    const diceSides = diceSideesMatch ? Number(diceSideesMatch[0]) : null;
-    const modifier = modifierMatch ? Number(modifierMatch[0]) : null;
-
-    if (!diceSides) return toast("Invalid number", { position: "top-center" });
-    if (!numDice) return toast("Invalid number", { position: "top-center" });
-
-    let result: number = 0;
-    for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
-    if (modifier) result += modifier;
-
-    toast(`You rolled ${result}`, { position: "top-center" });
-  };
-
-  return (
-    <>
-      {actions.map((a, index) => {
-        return (
-          <div id="actions" className="py-2" key={a.title}>
-            <h3 className="text-2xl font-light text-red-900">{a.title}</h3>
-            <hr className="border-black" />
-            <div className="pt-4 space-y-3">
-              {a.content.map((d, i) => {
-                if (!d) return;
-                const newDescription = reactStringReplace(
-                  d.description,
-                  /(\(\d{1,2}d\d{1,2}(?:\)| ?[+-] ?\d{1,2}\)))/gm, // (2d6 + 2) || (2d6-2)
-                  (match, i) => (
-                    <button
-                      className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-                      onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
-                      key={`${match}-${i}`}
-                    >
-                      {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
-                      {match.replace(/\s/g, "").slice(1, -1)}
-                    </button>
-                  )
-                );
-                const parseHits = reactStringReplace(
-                  newDescription,
-                  /((?<=\s|\.)\+\d+(?=\s|\.))/gm,
-                  (match, index) => (
-                    <RollModifier modifier={parseInt(match)} key={`${match}-${i}`} />
-                    // <button
-                    //   className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-                    //   key={`${match}-${i}`}
-                    //   onClick={() => toastHit(match)}
-                    // >
-                    //   {match}
-                    // </button>
-                  )
-                );
-
-                return (
-                  <div key={`${d.name}-${index}-${i}`}>
-                    {d.name !== "" && <span className="font-semibold italic">{d.name}. </span>}
-                    {/* {d.description} */}
-                    {/* {newDescription} */}
-                    {parseHits}
-                    {/* {combat &&
-                        (() => {
-                          const match = d.name.match(/(\d)\/day/i); // Match the number before "/day"
-                          if (match) {
-                            const count = parseInt(match[1], 10); // Extract and parse the number
-                            return Array.from({ length: count }, (_, index) => (
-                              <Toggle
-                                aria-label="Toggle bold"
-                                key={index} // Order is not changed 😶
-                                variant="outline"
-                                size="xs"
-                                className="rounded-full justify-center h-full bg-gray-500"
-                                defaultPressed
-                              >
-                                <Check className="h-2 w-2" />
-                              </Toggle>
-                            ));
-                          }
-                          return null; // Return nothing if no match
-                        })()} */}
-                    <br />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-};
-
-const RollModifier = ({ modifier }: { modifier: number }) => {
-  const toastDice = (input: string) => {
-    const number = parseInt(input);
-    if (isNaN(number)) return toast("Invalid number", { position: "top-center" });
-    // if (number < 1 || number > 20) return toast("Invalid number", { position: "top-center" });
-    const result = rollDice(20);
-
-    // Iff number is negative, we don't need the + symbol in the description
-    const description = number < 0 ? `(${result}${number})` : `(${result}+${number})`;
-
-    toast(`You rolled ${result + number}`, {
-      position: "top-center",
-      description,
-    });
-  };
-
-  return (
-    <button
-      className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-      onClick={() => toastDice(modifier.toString())}
-    >
-      {modifier > 0 ? `+${modifier}` : modifier}
-    </button>
-  );
-};
-
-// const rollDamage = ({ input }: { input: string }) => {
-//   const toastDice = (input: string) => {
-//     const numDiceMatch = input.match(/^\d+/);
-//     const diceSideesMatch = input.match(/(?<=d)\d+/);
-//     const modifierMatch = input.match(/(?<!d|\d)\d+$/);
-
-//     const numDice = numDiceMatch ? Number(numDiceMatch[0]) : null;
-//     const diceSides = diceSideesMatch ? Number(diceSideesMatch[0]) : null;
-//     const modifier = modifierMatch ? Number(modifierMatch[0]) : null;
-
-//     if (!diceSides) return toast("Invalid number", { position: "top-center" });
-//     if (!numDice) return toast("Invalid number", { position: "top-center" });
-
-//     let result: number = 0;
-//     for (let i = 0; i < numDice; i++) result += rollDice(diceSides);
-//     if (modifier) result += modifier;
-
-//     toast(`You rolled ${result}`, { position: "top-center" });
-//   };
-//   return (
-//     <button
-//       className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
-//       onClick={() => toastDice(match.replace(/\s/g, "").slice(1, -1))}
-//     >
-//       {/* The .replace is to delete Spaces. The .slice to delete parentheses */}
-//       {match.replace(/\s/g, "").slice(1, -1)}
-//     </button>
-//   );
-// };

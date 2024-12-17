@@ -86,3 +86,22 @@ export const updateEncounter = async (
   if (!data) throw new Error("No data returned");
   return data;
 };
+
+export const deleteEncounter = async (encounterId: number, userId?: string) => {
+  const supabase = await createClient();
+  let user_id = userId ?? (await authenticateUser(supabase)).id;
+
+  const { data, error } = await supabase
+    .from("encounters")
+    .delete()
+    .eq("id", encounterId)
+    .eq("user_id", user_id)
+    .select();
+
+  if (error) {
+    console.error("deleteEncounter", error);
+    throw error;
+  }
+  if (!data) throw new Error("No data returned");
+  return data;
+};
