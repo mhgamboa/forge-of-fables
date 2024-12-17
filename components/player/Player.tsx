@@ -13,8 +13,9 @@ export default function Player({ className }: { className?: string }) {
   const currentPlayer = combatants[currentTurn] as EncounterPlayerType;
   return (
     <div className={cn("bg-gray-100 dark:bg-gray-900 p-3 rounded-sm flex flex-col", className)}>
-      <div className="flex items-center justify-center rounded-md text-white w-full gap-x-3">
+      <div className="flex items-center justify-center rounded-md w-full gap-x-3">
         <h2 className="text-2xl font-bold text-red-900 text-center">{currentPlayer.name}</h2>
+        Total HP:
         <Input
           type="number"
           className="w-20 text-black"
@@ -27,7 +28,6 @@ export default function Player({ className }: { className?: string }) {
           }}
         />
       </div>
-      ShadCN Text Area
     </div>
   );
 }
