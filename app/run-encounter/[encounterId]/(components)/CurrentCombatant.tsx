@@ -28,7 +28,7 @@ export default function CurrentCombatant({ className }: Props) {
           className="h-full"
         />
       ) : (
-        <Player />
+        <Player className="h-full" />
       )}
     </div>
   );

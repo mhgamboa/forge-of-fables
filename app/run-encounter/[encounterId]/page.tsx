@@ -4,9 +4,8 @@ import { redirect } from "next/navigation";
 import { getEncounterWithRelationsFull } from "@/data-access/encounters";
 
 import InitializeZustand from "./(components)/InitializeZustand";
-import Combatants from "./(components)/Combatants";
+import Combatants from "./(components)/combatants/Combatants";
 import CurrentCombatant from "./(components)/CurrentCombatant";
-import InitiativeModal from "./(components)/initiative-modal/InitiativeModal";
 import EncounterNavbar from "./(components)/EncounterNavbar";
 
 type Props = {

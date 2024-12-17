@@ -1,11 +1,9 @@
 "use client";
 import React from "react";
-import { create } from "mutative";
 
 import { cn } from "@/lib/utils";
 import { useEncounterStore } from "@/providers/CombatProvider";
-import { Input } from "@/components/ui/input";
-import InitiativeModal from "./initiative-modal/InitiativeModal";
+import HPInput from "./HPInput";
 
 type Props = {
   className?: string;
@@ -13,17 +11,8 @@ type Props = {
 
 export default function Combatants({ className }: Props) {
   const combatants = useEncounterStore(state => state.combatants);
-  const setCombatants = useEncounterStore(state => state.setCombatants);
   const setCurrentTurn = useEncounterStore(state => state.setCurrentTurn);
   const currentTurn = useEncounterStore(state => state.currentTurn);
-
-  const handleHPChange = (e: React.ChangeEvent<HTMLInputElement>, i: number) => {
-    e.preventDefault();
-    const newState = create(combatants, draft => {
-      draft[i].currentHp = +e.target.value;
-    });
-    setCombatants(newState);
-  };
 
   return (
     <div
@@ -42,17 +31,9 @@ export default function Combatants({ className }: Props) {
             )}
             onClick={() => setCurrentTurn(i)}
           >
-            <div>{c.isMonster ? c.info.name : c.name}</div>
-            <div className="flex items-center justify-end space-x-4 w-32">
-              <Input
-                type="number"
-                value={c.currentHp}
-                onChange={e => handleHPChange(e, i)}
-                onClick={e => e.stopPropagation()}
-                className="w-20"
-              />
-              {c.isMonster && <>/{c.info.hp_value}</>}
-            </div>
+            <div className="w-28">{c.isMonster ? c.info.name : c.name}</div>
+            <HPInput i={i} />
+            <div className="w-16 text-end">{c.currentHp} </div>
           </div>
         );
       })}
