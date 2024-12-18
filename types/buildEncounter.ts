@@ -10,6 +10,7 @@ export type encounterMonstersToBeAddedType = {
   id: number;
   name: string;
   tempId: number;
+  notes: string | null;
 };
 export type EncounterPlayersType = {
   id: number;
@@ -20,6 +21,7 @@ export type EncounterPlayersType = {
 export type EncounterPlayersToBeAddedType = {
   name: string;
   tempId: number;
+  notes: string | null;
 };
 
 export type InitialEncounter = Awaited<ReturnType<typeof getEncounterWithRelations>>;

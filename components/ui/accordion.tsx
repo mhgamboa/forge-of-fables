@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -18,19 +19,36 @@ AccordionItem.displayName = "AccordionItem";
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & {
+    Icon?: React.ElementType;
+    iconClassName?: string;
+    onIconClick?: (event: React.MouseEvent) => void;
+  }
+>(({ className, children, Icon, iconClassName, onIconClick, ...props }, ref) => (
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
+        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>div>svg]:rotate-180",
         className
       )}
       {...props}
     >
       {children}
-      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+      <div className="flex items-center space-x-4">
+        {Icon && (
+          <div
+            onClick={e => {
+              e.stopPropagation();
+              onIconClick && onIconClick(e);
+            }}
+            className="cursor-pointer hover:bg-foreground/10 rounded-md p-1"
+          >
+            <Icon className={cn(iconClassName, "h-4 w-4")} />
+          </div>
+        )}
+        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+      </div>
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));

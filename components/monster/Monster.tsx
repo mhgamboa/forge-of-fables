@@ -91,21 +91,22 @@ export default function Monster({
       type,
     } = monster;
 
-  // Type casting for Supabase JSONB
+  // Type casting for Supabase JSONB.
+  // Unless we can implement types for JSONB, we'll have to do this.
   const typedSaves = saves as Saves;
   const typedSkills = skills as Skills;
   const typedTraits = traits as Traits;
   const typedActions = actions as Actions;
 
   // HP Change Handler
-  const handleHPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!currentCombat || !updateCombat || index === undefined) return;
+  // const handleHPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (!currentCombat || !updateCombat || index === undefined) return;
 
-    const newState = create(currentCombat, draft => {
-      draft[index].currentHp = +e.target.value;
-    });
-    updateCombat(newState);
-  };
+  //   const newState = create(currentCombat, draft => {
+  //     draft[index].currentHp = +e.target.value;
+  //   });
+  //   updateCombat(newState);
+  // };
 
   return (
     <div
@@ -116,14 +117,12 @@ export default function Monster({
       <Separator className="my-2" />
 
       {/* AC, HP, Speed */}
+      {/* prettier-ignore */}
       <MonsterStats
-        ac_value={ac_value}
-        ac_notes={ac_notes}
-        hp_value={hp_value}
-        hp_notes={hp_notes}
+        ac_value={ac_value} ac_notes={ac_notes}
+        hp_value={hp_value} hp_notes={hp_notes}
+        currentCombat={currentCombat} updateCombat={updateCombat}
         speed={speed}
-        updateCombat={updateCombat}
-        currentCombat={currentCombat}
         index={index}
       />
       <Separator className="my-2" />

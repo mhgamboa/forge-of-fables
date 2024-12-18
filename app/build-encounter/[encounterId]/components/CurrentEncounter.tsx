@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 import { handleSaveEncounter } from "@/utils/handleSaveEncounter";
 
 // TODO: Segment Mobile and Desktop in to separate files
-// TODO: Add a loading state. Maybe to context?
+// TODO: Add a loading state.
 export default function CurrentEncounter() {
   const { encounter, setEncounter } = useEncounterContext();
   useHandleSaveEncounter();
@@ -56,7 +56,7 @@ export default function CurrentEncounter() {
         <div className="sticky top-10 z-10 max-h-[90svh]">
           {" "}
           {/* Added z-index and adjusted top positioning */}
-          <div className="flex flex-col gap-4 p-4 border-2 border-foreground/10 rounded-md">
+          <div className="flex flex-col gap-4 p-2 border-2 border-foreground/10 rounded-md">
             <Input
               type="text"
               placeholder="Encounter Name"
@@ -65,7 +65,7 @@ export default function CurrentEncounter() {
               onChange={handleChange}
             />
 
-            <EncounterInfo className="overflow-y-scroll max-h-[60svh]" />
+            <EncounterInfo className="overflow-y-scroll scrollbar max-h-[60svh]" />
             <Button
               onClick={handleSave}
               disabled={encounter.encounterSaved}

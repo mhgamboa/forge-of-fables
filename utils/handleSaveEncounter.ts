@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import {
   createEncounter_monsters,
   deleteEncounter_monsters,
+  updateEncounter_monsters,
 } from "@/actions/encounter_monsterActions";
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -35,7 +36,6 @@ export async function handleSaveEncounter({
     toast.error("You must be logged in to save your encounter");
     return;
   }
-
   try {
     const res = await Promise.allSettled([
       encounter.encounter_monstersToBeAdded.length > 0
@@ -59,6 +59,9 @@ export async function handleSaveEncounter({
             encounter.newEncounterName,
             encounter.newEncounterDescription
           )
+        : Promise.resolve({ status: "fulfilled" }),
+      encounter.encounter_monstersToBeUpdated.length > 0
+        ? updateEncounter_monsters(encounter.encounter_monstersToBeUpdated, userId)
         : Promise.resolve({ status: "fulfilled" }),
     ]);
 
@@ -85,6 +88,9 @@ export async function handleSaveEncounter({
     else
       (updatedEncounter.newEncounterName = "") &&
         (updatedEncounter.newEncounterDescription = "undefined");
+
+    if (res[6].status === "rejected") errorMessages.push("Warning: Monsters were not updated");
+    else updatedEncounter.encounter_monstersToBeUpdated = [];
 
     // TODO: Instead of Querying the DB AGAIN, return values in promise.all and update encounter directly
     const newInitialEncounter = await getEncounterWithJoins(encounter.id);

@@ -27,16 +27,21 @@ export default function PlayersList() {
   };
 
   return (
-    <div className="flex flex-col justify-between w-full p-2 gap-y-3">
-      <CurrentPlayers />
-      <PlayersToBeAdded />
-      <PlayersToBeRemoved />
-      <div
-        onClick={e => addPlayer(e)}
-        className="flex justify-center w-full border p-2 rounded-md cursor-pointer"
-      >
-        <Plus className="text-gray-600" />
+    <>
+      <h2 className="text-center text-md lg:text-2xl font-bold text-gray-800 pt-3 dark:text-gray-200">
+        Players
+      </h2>
+      <div className="flex flex-col justify-between w-full p-2 gap-y-3">
+        <CurrentPlayers />
+        <PlayersToBeAdded />
+        <PlayersToBeRemoved />
+        <div
+          onClick={e => addPlayer(e)}
+          className="flex justify-center w-full border p-2 rounded-md cursor-pointer"
+        >
+          <Plus className="text-gray-600" />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
