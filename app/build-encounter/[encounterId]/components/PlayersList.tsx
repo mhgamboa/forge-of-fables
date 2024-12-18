@@ -20,6 +20,7 @@ export default function PlayersList() {
       draft.encounter_playersToBeAdded.push({
         name: `Player ${encounter_players.length + encounter_playersToBeAdded.length + 1}`,
         tempId: Math.floor(Math.random() * 1000000),
+        notes: null,
       });
       return draft;
     });

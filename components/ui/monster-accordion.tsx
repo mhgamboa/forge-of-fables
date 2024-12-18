@@ -56,7 +56,7 @@ const EncounterInteract = ({ monster }: { monster: Tables<"monsters"> }) => {
 
     const tempId = Math.floor(Math.random() * 1000000);
     const nextState = create(encounter, draft => {
-      draft.encounter_monstersToBeAdded.push({ id, name, tempId });
+      draft.encounter_monstersToBeAdded.push({ id, name, tempId, notes: null });
       draft.encounterSaved = false;
     });
     setEncounter(nextState);
