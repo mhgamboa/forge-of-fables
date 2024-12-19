@@ -22,6 +22,7 @@ import TraitsDisplay from "./TraitsDisplay";
 import ListDisplay from "./ListDisplay";
 import SavesDisplay from "./SavesDisplay";
 import MonsterStats from "./MonsterStats";
+import { Textarea } from "../ui/textarea";
 
 // Props Type
 interface MonsterProps {
@@ -31,6 +32,8 @@ interface MonsterProps {
   currentCombat?: (EncounterPlayerType | EncounterMonsterType)[];
   index?: number;
   className?: string;
+  notes?: string | null;
+  onNotesChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 // Utility Functions
@@ -74,6 +77,8 @@ export default function Monster({
   currentCombat,
   index,
   className,
+  notes,
+  onNotesChange,
 }: MonsterProps) {
   // prettier-ignore
   const {
@@ -110,63 +115,68 @@ export default function Monster({
 
   return (
     <div
-      className={cn("lg:columns-2 lg:gap-4 bg-gray-100 dark:bg-gray-900 p-3 rounded-sm", className)}
+      className={cn("bg-gray-100 dark:bg-gray-900 p-3 rounded-sm flex flex-col gap-y-4", className)}
     >
-      {/* Name */}
-      <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
-      <Separator className="my-2" />
+      <div className={cn("lg:columns-2 lg:gap-4")}>
+        {/* Name */}
+        <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
+        <Separator className="my-2" />
 
-      {/* AC, HP, Speed */}
-      {/* prettier-ignore */}
-      <MonsterStats
+        {/* AC, HP, Speed */}
+        {/* prettier-ignore */}
+        <MonsterStats
         ac_value={ac_value} ac_notes={ac_notes}
         hp_value={hp_value} hp_notes={hp_notes}
         currentCombat={currentCombat} updateCombat={updateCombat}
         speed={speed}
         index={index}
       />
-      <Separator className="my-2" />
+        <Separator className="my-2" />
 
-      {/* Ability Scores */}
-      <div className="flex w-full py-2 text-red-900">
-        <AbilityScore name="str" modifier={str} combat={combat} />
-        <AbilityScore name="dex" modifier={dex} combat={combat} />
-        <AbilityScore name="con" modifier={con} combat={combat} />
-        <AbilityScore name="int" modifier={int} combat={combat} />
-        <AbilityScore name="wis" modifier={wis} combat={combat} />
-        <AbilityScore name="cha" modifier={cha} combat={combat} />
+        {/* Ability Scores */}
+        <div className="flex w-full py-2 text-red-900">
+          <AbilityScore name="str" modifier={str} combat={combat} />
+          <AbilityScore name="dex" modifier={dex} combat={combat} />
+          <AbilityScore name="con" modifier={con} combat={combat} />
+          <AbilityScore name="int" modifier={int} combat={combat} />
+          <AbilityScore name="wis" modifier={wis} combat={combat} />
+          <AbilityScore name="cha" modifier={cha} combat={combat} />
+        </div>
+        <Separator className="my-2" />
+
+        {/* Vulnerabilities, Resistances, Immunities, Saves, Skills, etc. */}
+        <div className="flex w-full flex-col py-2 gap-y-2 text-red-900">
+          <ListDisplay list={damage_vulnerabilities} title="Damage Vulnerabilities" />
+          <ListDisplay list={damage_resistances} title="Damage Resistances" />
+          <ListDisplay list={damage_immunities} title="Damage Immunities" />
+          <ListDisplay list={condition_immunities} title="Condition Immunities" />
+
+          <SavesDisplay saves={typedSaves} />
+
+          {typedSkills.length >= 1 && (
+            <div>
+              <span className="font-bold">Skills</span>{" "}
+              {typedSkills.map(s => `${s.name} +${s.modifier}`).join(", ")}
+            </div>
+          )}
+
+          <ListDisplay list={senses} title="Senses" />
+          <ListDisplay list={languages} title="Languages" />
+
+          {challenge && (
+            <div>
+              <span className="font-bold">Challenge</span> {challenge} ({calculateXP(challenge)} XP)
+            </div>
+          )}
+        </div>
+        <Separator className="my-2" />
+
+        <TraitsDisplay traits={typedTraits} />
+        <ActionsDisplay actions={typedActions} />
       </div>
-      <Separator className="my-2" />
-
-      {/* Vulnerabilities, Resistances, Immunities, Saves, Skills, etc. */}
-      <div className="flex w-full flex-col py-2 gap-y-2 text-red-900">
-        <ListDisplay list={damage_vulnerabilities} title="Damage Vulnerabilities" />
-        <ListDisplay list={damage_resistances} title="Damage Resistances" />
-        <ListDisplay list={damage_immunities} title="Damage Immunities" />
-        <ListDisplay list={condition_immunities} title="Condition Immunities" />
-
-        <SavesDisplay saves={typedSaves} />
-
-        {typedSkills.length >= 1 && (
-          <div>
-            <span className="font-bold">Skills</span>{" "}
-            {typedSkills.map(s => `${s.name} +${s.modifier}`).join(", ")}
-          </div>
-        )}
-
-        <ListDisplay list={senses} title="Senses" />
-        <ListDisplay list={languages} title="Languages" />
-
-        {challenge && (
-          <div>
-            <span className="font-bold">Challenge</span> {challenge} ({calculateXP(challenge)} XP)
-          </div>
-        )}
-      </div>
-      <Separator className="my-2" />
-
-      <TraitsDisplay traits={typedTraits} />
-      <ActionsDisplay actions={typedActions} />
+      {(notes || combat) && (
+        <Textarea placeholder="Add Any Notes here" value={notes ?? ""} onChange={onNotesChange} />
+      )}
     </div>
   );
 }

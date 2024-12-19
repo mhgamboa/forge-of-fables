@@ -12,7 +12,7 @@ export const getMyEncounters = async () => {
     .from("encounters")
     .select()
     .eq("user_id", user_id)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: true });
 
   return encounters;
 };
