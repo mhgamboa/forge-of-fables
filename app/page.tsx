@@ -34,7 +34,7 @@ export default function LandingPage() {
       {/* Hot Keys */}
       {/* Automated Saving Throws */}
       {/* Monster Waves */}
-      <section className="py-16 bg-white dark:bg-zinc-950 w-full">
+      <section className="py-16 bg-white dark:bg-background w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
             {features.map((feature, index) => (
@@ -58,7 +58,7 @@ export default function LandingPage() {
                   <feature.icon className="h-6 w-6" />
                 </div>
                 <div className="mt-5">
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-zinc-100">
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-primary-foreground">
                     {feature.title}
                   </h2>
                   <p className="mt-2 text-base text-gray-500 dark:text-zinc-400">
