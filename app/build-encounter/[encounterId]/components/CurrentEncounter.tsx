@@ -46,7 +46,6 @@ export default function CurrentEncounter() {
     encounter.name === e.target.value
       ? setEncounter({ ...encounter, newEncounterName: "" })
       : setEncounter({ ...encounter, newEncounterName: e.target.value });
-    console.log(encounter);
   };
 
   return (

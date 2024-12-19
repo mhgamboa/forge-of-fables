@@ -17,7 +17,6 @@ export default function PlayersToBeRemoved() {
       draft.encounter_playersToBeRemoved = draft.encounter_playersToBeRemoved.filter(
         p => p.id !== player.id
       );
-      return draft;
     });
     setEncounter(nextState);
   };

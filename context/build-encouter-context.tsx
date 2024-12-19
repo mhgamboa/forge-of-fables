@@ -19,7 +19,7 @@ export type EncounterContextType = InitialEncounter & {
   encounter_monstersToBeUpdated: Tables<"encounter_monsters">[];
   encounter_playersToBeAdded: EncounterPlayersToBeAddedType[];
   encounter_playersToBeRemoved: EncounterPlayersType[];
-  encounter_playersToBeUpdated: EncounterPlayersType[];
+  encounter_playersToBeUpdated: Tables<"encounter_players">[];
   encounterSaved: boolean;
 };
 

@@ -58,19 +58,22 @@ export default function MonstersList() {
       const index = draft.encounter_monstersToBeUpdated.findIndex(monster => monster.id === m.id);
       const notes = e.target.value === "" ? null : e.target.value;
 
+      // If monster is not in the encounter_monstersToBeUpdated array, add it
       if (index === -1)
         draft.encounter_monstersToBeUpdated.push({
           encounter_id: draft.id,
           id: m.id,
           monster_id: m.monsters!.id,
           notes,
-          created_at: "", // Placeholder to keep TS happy
-          user_id: "", // Placeholder to keep TS happy
+          created_at: "", // Placeholder to keep TS happy. When writing to DB, will be set
+          user_id: "", // Placeholder to keep TS happy. When writing to DB, will be set
         });
+      // If notes are the same, remove it from the encounter_monstersToBeUpdated array
       else if (notes === m.notes) draft.encounter_monstersToBeUpdated.splice(index, 1);
+      // If notes are different, update the notes in the encounter_monstersToBeUpdated array
       else draft.encounter_monstersToBeUpdated[index].notes = notes;
     });
-    console.log(nextState);
+
     setEncounter(nextState);
   };
 
@@ -124,7 +127,8 @@ export default function MonstersList() {
 
         {encounter.encounter_monstersToBeAdded.map(monster => (
           <MonsterAccordionItem
-            key={monster.id}
+            key={monster.tempId}
+            id={monster.tempId}
             monster={monster}
             icon={X}
             iconClassName="text-red-800"

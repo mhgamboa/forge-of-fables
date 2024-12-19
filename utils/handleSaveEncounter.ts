@@ -38,12 +38,17 @@ export async function handleSaveEncounter({
   }
   try {
     const res = await Promise.allSettled([
+      // Monster-related actions
       encounter.encounter_monstersToBeAdded.length > 0
         ? createEncounter_monsters(encounter.encounter_monstersToBeAdded, encounter.id, userId)
         : Promise.resolve({ status: "fulfilled" }),
       encounter.encounter_monstersToBeRemoved.length > 0
         ? deleteEncounter_monsters(encounter.encounter_monstersToBeRemoved, userId)
         : Promise.resolve({ status: "fulfilled" }),
+      encounter.encounter_monstersToBeUpdated.length > 0
+        ? updateEncounter_monsters(encounter.encounter_monstersToBeUpdated, userId)
+        : Promise.resolve({ status: "fulfilled" }),
+      // Player-related actions
       encounter.encounter_playersToBeAdded.length > 0
         ? createEncounter_players(encounter.encounter_playersToBeAdded, encounter.id, userId)
         : Promise.resolve({ status: "fulfilled" }),
@@ -53,6 +58,7 @@ export async function handleSaveEncounter({
       encounter.encounter_playersToBeUpdated.length > 0
         ? updateEncounter_players(encounter.encounter_playersToBeUpdated, userId)
         : Promise.resolve({ status: "fulfilled" }),
+      // Encounter-specific actions
       encounter.newEncounterName || encounter.newEncounterDescription
         ? updateEncounter(
             encounter.id,
@@ -60,37 +66,38 @@ export async function handleSaveEncounter({
             encounter.newEncounterDescription
           )
         : Promise.resolve({ status: "fulfilled" }),
-      encounter.encounter_monstersToBeUpdated.length > 0
-        ? updateEncounter_monsters(encounter.encounter_monstersToBeUpdated, userId)
-        : Promise.resolve({ status: "fulfilled" }),
     ]);
 
     let errorMessages: string[] = [];
     const updatedEncounter = { ...encounter };
 
-    if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
+    // Monster-related results
+    if (res[0].status === "rejected") errorMessages.push("Warning: Monsters were not added");
     else updatedEncounter.encounter_monstersToBeAdded = [];
 
     if (res[1].status === "rejected") errorMessages.push("Warning: Monsters were not removed");
     else updatedEncounter.encounter_monstersToBeRemoved = [];
 
-    if (res[2].status === "rejected") errorMessages.push("Warning: Players were not added");
+    if (res[2].status === "rejected") errorMessages.push("Warning: Monsters were not updated");
+    else updatedEncounter.encounter_monstersToBeUpdated = [];
+
+    // Player-related results
+    if (res[3].status === "rejected") errorMessages.push("Warning: Players were not added");
     else updatedEncounter.encounter_playersToBeAdded = [];
 
-    if (res[3].status === "rejected") errorMessages.push("Warning: Players were not removed");
+    if (res[4].status === "rejected") errorMessages.push("Warning: Players were not removed");
     else updatedEncounter.encounter_playersToBeRemoved = [];
 
-    if (res[4].status === "rejected") errorMessages.push("Warning: Players were not updated");
+    if (res[5].status === "rejected") errorMessages.push("Warning: Players were not updated");
     else updatedEncounter.encounter_playersToBeUpdated = [];
 
-    if (res[5].status === "rejected")
+    // Encounter-specific results
+    if (res[6].status === "rejected")
       errorMessages.push("Warning: Encounter Name & Description was not updated");
-    else
-      (updatedEncounter.newEncounterName = "") &&
-        (updatedEncounter.newEncounterDescription = "undefined");
-
-    if (res[6].status === "rejected") errorMessages.push("Warning: Monsters were not updated");
-    else updatedEncounter.encounter_monstersToBeUpdated = [];
+    else {
+      updatedEncounter.newEncounterName = "";
+      updatedEncounter.newEncounterDescription = "undefined";
+    }
 
     // TODO: Instead of Querying the DB AGAIN, return values in promise.all and update encounter directly
     const newInitialEncounter = await getEncounterWithJoins(encounter.id);

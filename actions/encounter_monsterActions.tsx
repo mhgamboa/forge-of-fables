@@ -87,11 +87,9 @@ export const updateEncounter_monsters = async (
     user_id,
   }));
 
-  console.log(formattedArr);
   const { data, error } = await supabase
     .from("encounter_monsters")
     .upsert(formattedArr, { onConflict: "id" })
-    // .upsert(formattedArr, { onConflict: "id" })
     .eq("user_id", user_id);
 
   if (error) {

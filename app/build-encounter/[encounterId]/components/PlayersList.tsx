@@ -4,15 +4,19 @@ import { create } from "mutative";
 
 import { useEncounterContext } from "@/context/build-encouter-context";
 
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 import CurrentPlayers from "./currentEncounter/players/CurrentPlayers";
 import PlayersToBeAdded from "./currentEncounter/players/PlayersToBeAdded";
 import PlayersToBeRemoved from "./currentEncounter/players/PlayersToBeRemoved";
+import { Accordion } from "@/components/ui/accordion";
+import MonsterAccordionItem from "./currentEncounter/monsters/AccordionItem";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 export default function PlayersList() {
   const { encounter, setEncounter } = useEncounterContext();
-  const { encounter_players, encounter_playersToBeAdded } = encounter;
+  const { encounter_players, encounter_playersToBeAdded, encounter_playersToBeUpdated } = encounter;
 
   const addPlayer = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const nextState = create(encounter, draft => {
@@ -33,8 +37,10 @@ export default function PlayersList() {
         Players
       </h2>
       <div className="flex flex-col justify-between w-full p-2 gap-y-3">
-        <CurrentPlayers />
-        <PlayersToBeAdded />
+        <Accordion type="multiple" className="w-full">
+          <CurrentPlayers />
+          <PlayersToBeAdded />
+        </Accordion>
         <PlayersToBeRemoved />
         <div
           onClick={e => addPlayer(e)}

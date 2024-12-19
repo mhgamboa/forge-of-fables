@@ -31,7 +31,7 @@ export default function DeleteDialog({ id }: { id: number }) {
       await deleteEncounter(id, userId);
       router.refresh();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Error deleting encounter", { position: "top-center" });
     } finally {
       setLoading(false);

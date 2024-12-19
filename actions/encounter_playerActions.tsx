@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { authenticateUser } from "@/data-access/auth";
 
 import { EncounterPlayersToBeAddedType, EncounterPlayersType } from "@/types/buildEncounter";
+import { Tables } from "@/types/database.types";
 
 export const createEncounter_players = async (
   arr: EncounterPlayersToBeAddedType[],
@@ -16,6 +17,7 @@ export const createEncounter_players = async (
     encounter_id: encounterId,
     user_id,
     name: obj.name,
+    notes: obj.notes,
   }));
 
   const { data, error } = await supabase.from("encounter_players").insert(formattedArr).select();
@@ -47,7 +49,10 @@ export const deleteEncounter_players = async (arr: EncounterPlayersType[], userI
   return data;
 };
 
-export const updateEncounter_players = async (arr: EncounterPlayersType[], userId?: string) => {
+export const updateEncounter_players = async (
+  arr: Tables<"encounter_players">[],
+  userId?: string
+) => {
   if (arr.length === 0) return;
   const supabase = await createClient();
 
@@ -55,11 +60,17 @@ export const updateEncounter_players = async (arr: EncounterPlayersType[], userI
 
   const formattedArr = arr.map(obj => ({
     id: obj.id,
+    encounter_id: obj.encounter_id,
     name: obj.name,
+    notes: obj.notes,
     user_id,
   }));
 
-  const { data, error } = await supabase.from("encounter_players").upsert(formattedArr).select();
+  const { data, error } = await supabase
+    .from("encounter_players")
+    .upsert(formattedArr, { onConflict: "id" })
+    .eq("user_id", user_id);
+
   if (error) {
     console.error("updateEncounter_players", error);
     throw error;

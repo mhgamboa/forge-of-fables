@@ -14,6 +14,7 @@ interface MonsterAccordionItemProps {
   className?: string;
   notes?: string | null;
   isRemoved?: boolean;
+  id?: number;
 }
 
 export default function MonsterAccordionItem({
@@ -25,11 +26,12 @@ export default function MonsterAccordionItem({
   className,
   notes,
   isRemoved = false,
+  id,
 }: MonsterAccordionItemProps) {
   const name = "monsters" in monster ? monster.monsters?.name : monster.name;
 
   return (
-    <AccordionItem value={`${monster.id}`}>
+    <AccordionItem value={`${id ? id : monster.id}`}>
       <AccordionTrigger
         Icon={Icon}
         iconClassName={iconClassName}
