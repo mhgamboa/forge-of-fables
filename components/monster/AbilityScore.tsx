@@ -16,7 +16,8 @@ export default function AbilityScore({ name, modifier, combat }: AbilityScorePro
       <div>
         {combat ? (
           <button
-            className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+            // className="rounded border border-red-600 bg-gray-800 text-white hover:bg-red-600 hover:text-black transition-all duration-200 px-2 py-1 shadow-md"
+            className="rounded border border-red-700 bg-white dark:bg-gray-800 dark:text-white bg-opacity-75 px-1 py-0.5"
             onClick={() => toastDiceRoll(abilityModifier.toString(), "modifier")}
           >
             {abilityModifier > 0 ? `+${abilityModifier}` : abilityModifier}

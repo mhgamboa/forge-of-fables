@@ -14,7 +14,7 @@ export default function ActionsDisplay({ actions }: ActionsDisplayProps) {
     <>
       {actions.map((action, actionIndex) => (
         <div id="actions" className="py-2" key={action.title}>
-          <h3 className="text-2xl font-light text-red-900">{action.title}</h3>
+          <h3 className="text-2xl font-light text-red-700">{action.title}</h3>
           <hr className="border-black" />
           <div className="pt-4 space-y-3">
             {action.content.map((content, contentIndex) => {
@@ -26,7 +26,7 @@ export default function ActionsDisplay({ actions }: ActionsDisplayProps) {
                 (match, i) => (
                   <button
                     key={`${match}-${i}`}
-                    className="rounded border border-red-700 bg-white bg-opacity-75 px-0.5"
+                    className="rounded border border-red-700 bg-white dark:bg-gray-800 dark:text-white bg-opacity-75 px-1 py-0.5"
                     onClick={() => toastDiceRoll(match.replace(/\s/g, "").slice(1, -1))}
                   >
                     {match.replace(/\s/g, "").slice(1, -1)}

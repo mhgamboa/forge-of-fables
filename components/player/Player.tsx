@@ -25,7 +25,7 @@ export default function Player({ className }: { className?: string }) {
       className={cn("bg-gray-100 dark:bg-gray-900 p-3 rounded-sm flex flex-col gap-y-4", className)}
     >
       <div className="flex items-center justify-center rounded-md w-full gap-x-3">
-        <h2 className="text-2xl font-bold text-red-900 text-center">{currentPlayer.name}</h2>
+        <h2 className="text-2xl font-bold dark:text-primary text-center">{currentPlayer.name}</h2>
         Total HP:
         <Input
           type="number"

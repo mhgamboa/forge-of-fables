@@ -34,7 +34,7 @@ export default function MonsterStats({
   };
 
   return (
-    <div className="py-2 text-red-900">
+    <div className="py-2 text-red-700">
       <div>
         <span className="font-bold">Armor Class</span> {ac_value} {ac_notes}
       </div>

@@ -119,7 +119,7 @@ export default function Monster({
     >
       <div className={cn("lg:columns-2 lg:gap-4")}>
         {/* Name */}
-        <div className="pb-2 text-2xl font-bold text-red-900">{name}</div>
+        <div className="pb-2 text-2xl font-bold text-red-700">{name}</div>
         <Separator className="my-2" />
 
         {/* AC, HP, Speed */}
@@ -134,7 +134,7 @@ export default function Monster({
         <Separator className="my-2" />
 
         {/* Ability Scores */}
-        <div className="flex w-full py-2 text-red-900">
+        <div className="flex w-full py-2 text-red-700">
           <AbilityScore name="str" modifier={str} combat={combat} />
           <AbilityScore name="dex" modifier={dex} combat={combat} />
           <AbilityScore name="con" modifier={con} combat={combat} />
@@ -145,7 +145,7 @@ export default function Monster({
         <Separator className="my-2" />
 
         {/* Vulnerabilities, Resistances, Immunities, Saves, Skills, etc. */}
-        <div className="flex w-full flex-col py-2 gap-y-2 text-red-900">
+        <div className="flex w-full flex-col py-2 gap-y-2 text-red-700">
           <ListDisplay list={damage_vulnerabilities} title="Damage Vulnerabilities" />
           <ListDisplay list={damage_resistances} title="Damage Resistances" />
           <ListDisplay list={damage_immunities} title="Damage Immunities" />
