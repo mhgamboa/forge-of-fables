@@ -7,13 +7,15 @@ import { Tables } from "@/types/database.types";
 
 export const insertMonster = async (monster: Tables<"monsters">, userId?: string) => {
   const supabase = await createClient();
-  // Authenticate User
-  let user_id = userId ?? (await authenticateUser(supabase)).id;
 
-  // Create Monster
+  // Authenticate User
+  const user_id = userId ?? (await authenticateUser(supabase)).id;
+
+  const { id: _id, ...updatedMonster } = monster; // We want Supbase to handle the ID, so we remove it here
+
   const { data, error } = await supabase
     .from("monsters")
-    .insert({ ...monster, user_id })
+    .insert({ ...updatedMonster, user_id })
     .select();
 
   if (error) {
@@ -33,11 +35,13 @@ export const updateMonster = async (
   // Authenticate User
   let user_id = userId ?? (await authenticateUser(supabase)).id;
 
+  const id = monsterId ? monsterId : monster.id;
+
   // Update Monster
   const { data, error } = await supabase
     .from("monsters")
-    .update({ ...monster, user_id, id: monsterId ? monsterId : monster.id })
-    .eq("id", monsterId ? monsterId : monster.id)
+    .update({ ...monster, user_id, id })
+    .eq("id", id)
     .eq("user_id", user_id)
     .select();
 
