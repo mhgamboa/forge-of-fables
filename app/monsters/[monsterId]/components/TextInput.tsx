@@ -26,11 +26,11 @@ export default function TextInput() {
       const supabase = createClient();
       const monsterId = +pathname.split("/").at(-1)!;
       const { data, error } = await supabase.auth.getSession();
-      if (!data?.session?.user.id) {
+      if (!data?.session?.user.id || error) {
         toast.error("You must be logged in to save monster");
         redirect("/login");
       }
-      const monster = parseMonsterText(text);
+      const monster = parseMonsterText(text, monsterId);
       if (!monster) throw new Error("No monster found");
       await updateMonster(monster, data?.session?.user.id, monsterId);
       toast.success("Successfully updated monster", { position: "top-center" });
