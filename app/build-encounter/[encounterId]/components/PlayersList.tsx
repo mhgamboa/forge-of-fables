@@ -37,7 +37,7 @@ export default function PlayersList() {
         Players
       </h2>
       <div className="flex flex-col justify-between w-full p-2 gap-y-3">
-        <Accordion type="multiple" className="w-full">
+        <Accordion type="single" className="w-full">
           <CurrentPlayers />
           <PlayersToBeAdded />
         </Accordion>

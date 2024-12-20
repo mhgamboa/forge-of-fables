@@ -94,7 +94,7 @@ export default function MonstersList() {
       <h2 className="text-center text-md lg:text-2xl font-bold text-gray-800 pb-2 dark:text-gray-200">
         Monsters
       </h2>
-      <Accordion type="multiple" className="w-full">
+      <Accordion type="single" className="w-full">
         {encounter.encounter_monsters.map(monster => (
           <MonsterAccordionItem
             key={monster.id}
