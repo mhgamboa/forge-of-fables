@@ -1,15 +1,19 @@
-function parseAC(input: string) {
+type ReturnType = {
+  value: number;
+  notes: string;
+};
+
+export default function parseAC(input: string): ReturnType {
   const regExp: RegExp = /(?<=\n)Armor Class.+(?=\n)/;
 
   const armorClassMatch: RegExpMatchArray | null = input.match(regExp);
-  if (!armorClassMatch) return { value: "??", notes: "" };
+  if (!armorClassMatch) return { value: 0, notes: "" };
 
   const value = parseValue(armorClassMatch[0]);
   const notes = parseNotes(armorClassMatch[0]);
 
   return { value, notes };
 }
-export default parseAC;
 
 const parseValue = (string: string) => {
   const valueMatch = string.match(/\d+/);

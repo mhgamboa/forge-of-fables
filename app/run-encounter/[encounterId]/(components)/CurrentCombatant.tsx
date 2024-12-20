@@ -21,7 +21,6 @@ export default function CurrentCombatant({ className }: Props) {
   const currentPlayer = combatants[currentTurn];
 
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.log("notes change");
     const newState = create(combatants, draft => {
       draft[currentTurn].notes = e.target.value;
     });

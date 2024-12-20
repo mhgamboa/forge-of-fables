@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import Monster from "@/components/monster/Monster";
 
 import parse from "@/lib/import-monster/_parse";
-import { insertMonster } from "./actions";
+import { insertMonster } from "@/actions/monsterActions";
 
 export default function ImportMonster() {
   const supabase = createClient();
@@ -28,7 +28,6 @@ export default function ImportMonster() {
       redirect("/login");
     }
 
-    // TODO: Add empty array for tags in Parse
     try {
       if (!monster) throw new Error("No monster found");
       await insertMonster(monster);
@@ -58,3 +57,9 @@ export default function ImportMonster() {
     </div>
   );
 }
+
+type dog = {
+  name: string;
+  age: number;
+  dogBreed: string;
+};

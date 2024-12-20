@@ -39,7 +39,7 @@ export default function MonsterStats({
         <span className="font-bold">Armor Class</span> {ac_value} {ac_notes}
       </div>
       <div className="flex items-center space-x-1">
-        <span className="font-bold">Hit Points</span>{" "}
+        <span className="font-bold mr-1">Hit Points </span>
         {updateCombat && (
           <Input
             type="number"

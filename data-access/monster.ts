@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { authenticateUser } from "./auth";
 
 export const getXMonsters = async (query?: string) => {
   // const quantity = x ?? 10;
@@ -39,7 +40,8 @@ export const getMyMonsters = async () => {
     .from("monsters")
     .select()
     .eq("is_deleted", false)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .order("name", { ascending: true });
   return monsters;
 };
 
@@ -47,4 +49,21 @@ export const getMonstersById = async (monsterIds: number[]) => {
   const supabase = await createClient();
   const { data: monsters } = await supabase.from("monsters").select().in("id", monsterIds);
   return monsters;
+};
+
+export const getSingleMonster = async (monsterId: number, columns?: string[]) => {
+  const supabase = await createClient();
+  const { id: user_id } = await authenticateUser(supabase);
+  const { data: monster, error } = await supabase
+    .from("monsters")
+    .select()
+    .eq("id", monsterId)
+    .eq("user_id", user_id)
+    .single();
+
+  if (error || !monster) {
+    console.error("data-access/monster.ts getSingleMonster", error);
+    redirect("/monsters/list");
+  }
+  return monster;
 };

@@ -10,7 +10,7 @@ import parseChallenge from "./parseChallenge";
 import parseTraitActions from "./parseTraitsActions";
 import { Tables } from "@/types/database.types";
 
-const parse = (input: string) => {
+const parseMonsterText = (input: string, id?: number): Tables<"monsters"> => {
   const arr = input.split(/\n/gm);
   const ac = parseAC(input);
   const hp = parseHP(input);
@@ -58,6 +58,7 @@ const parse = (input: string) => {
   // } as Tables<"monsters">;
 
   return {
+    id: id ? id : 0,
     name: arr[0],
     source: "",
     type: arr[1],
@@ -86,7 +87,9 @@ const parse = (input: string) => {
     description: "",
     tags: [] as string[],
     raw_text: input,
-  } as Tables<"monsters">;
+    is_deleted: false,
+    user_id: "",
+  };
 };
 
-export default parse;
+export default parseMonsterText;

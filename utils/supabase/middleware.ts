@@ -43,8 +43,7 @@ export const updateSession = async (request: NextRequest) => {
       "/build-encounter",
       "/my-encounters",
       "/run-encounter",
-      "/import-monster",
-      "/my-monsters",
+      "/monsters",
     ];
 
     // Check if the request matches any protected route

@@ -1,15 +1,19 @@
-const parseHP = (input: string) => {
+type ReturnType = {
+  value: number;
+  notes: string;
+};
+
+export default function (input: string): ReturnType {
   const regExp: RegExp = /(?<=\n)Hit Points.+(?=\n)/;
 
   const HPMatch: RegExpMatchArray | null = input.match(regExp);
-  if (!HPMatch) return { value: "??", notes: "" };
+  if (!HPMatch) return { value: 0, notes: "" };
 
   const value = parseValue(HPMatch[0]);
   const notes = parseNotes(HPMatch[0]);
 
   return { value, notes };
-};
-export default parseHP;
+}
 
 const parseValue = (string: string) => {
   const valueMatch = string.match(/\d+/);

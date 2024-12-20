@@ -1,19 +1,17 @@
 "use client";
-// TODO: Update Shadcn Sonner?
 
+// TODO: Update Shadcn Sonner?
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { toast } from "sonner";
 
-import { CircleArrowLeft, Menu, Mountain } from "lucide-react";
+import { Mountain } from "lucide-react";
 import MobileView from "./MobileView";
 import DesktopView from "./DesktopView";
-import InitiativeModal from "@/app/run-encounter/[encounterId]/(components)/initiative-modal/InitiativeModal";
 
 export const navLinks = [
   { name: "My Encounters", href: "/my-encounters", prefetch: true },
-  { name: "My Monsters", href: "/my-monsters", prefetch: false },
-  { name: "Import Monster", href: "/import-monster", prefetch: true },
+  { name: "My Monsters", href: "/monsters/list", prefetch: true },
+  { name: "Import Monster", href: "/monsters/import", prefetch: true },
 ];
 
 export default function Component() {
