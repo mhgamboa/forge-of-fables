@@ -17,22 +17,35 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export default function DeleteDialog({ id }: { id: number }) {
+type Props = {
+  title: string;
+  description: string;
+  confirmText: string;
+  deleteFunction: () => Promise<void>;
+  errorText: string;
+  trigger: JSX.Element;
+};
+
+export default function DeleteDialog({
+  title,
+  description,
+  confirmText,
+  deleteFunction,
+  errorText,
+  trigger,
+}: Props) {
+  // export default function DeleteDialog({ id }: { id: number }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const session = await supabase.auth.getSession();
-      const userId = session.data.session?.user.id;
-
-      await deleteEncounter(id, userId);
+      await deleteFunction();
       router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error("Error deleting encounter", { position: "top-center" });
+      toast.error(errorText, { position: "top-center" });
     } finally {
       setLoading(false);
     }
@@ -40,13 +53,16 @@ export default function DeleteDialog({ id }: { id: number }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <X className="h-8 w-8 text-red-700 cursor-pointer" />
+        {trigger}
+        {/* <X className="h-8 w-8 text-red-700 cursor-pointer" /> */}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {/* <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle> */}
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your encounter.
+            {description}
+            {/* cannot be undone. This will permanently delete your encounter. */}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -54,8 +70,10 @@ export default function DeleteDialog({ id }: { id: number }) {
           <AlertDialogAction
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             onClick={handleClick}
+            // onClick={handleClick}
           >
-            {loading ? <Loader className="h-4 w-4 animate-spin" /> : "Delete Encounter"}
+            {loading ? <Loader className="h-4 w-4 animate-spin" /> : confirmText}
+            {/* {loading ? <Loader className="h-4 w-4 animate-spin" /> : "Delete Encounter"} */}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

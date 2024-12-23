@@ -52,3 +52,16 @@ export const updateMonster = async (
   if (!data) throw new Error("No data returned");
   return data;
 };
+
+export const deleteMonster = async (id: number, userId?: string) => {
+  const supabase = await createClient();
+  // Authenticate User
+  let user_id = userId ?? (await authenticateUser(supabase)).id;
+
+  const { error } = await supabase.from("monsters").delete().eq("id", id).eq("user_id", user_id);
+
+  if (error) {
+    console.error("/actions/monsterActions.ts deleteMonster", error);
+    throw error;
+  }
+};
